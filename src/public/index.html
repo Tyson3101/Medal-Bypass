@@ -92,7 +92,11 @@
         downloadVideo(params.url);
       }
       async function downloadVideo(initialURL) {
-        const url = initialURL || document.querySelector("input").value;
+        let url = document.querySelector("input").value;
+        if (initialURL) {
+          url = initialURL;
+        }
+        console.log({ url });
         if (lastURL === url && url.length)
           return alert("Medal clip already downloading/downloaded");
         if (!url.length) return alert("... ?");
