@@ -33,9 +33,10 @@
       a {
         display: block;
         padding: 0.5rem 0;
+        color: rgb(179, 179, 238);
       }
       a:hover {
-        color: rgb(127, 127, 223);
+        color: rgb(120, 120, 205);
       }
       input {
         width: 40vw;
@@ -92,7 +93,7 @@
       }
       async function downloadVideo(initialURL) {
         let url = document.querySelector("input").value;
-        if (initialURL) {
+        if (initialURL?.length) {
           url = initialURL;
         }
         console.log({ url });
