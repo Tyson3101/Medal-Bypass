@@ -85,11 +85,10 @@
       const loading = document.querySelector("p");
       document.querySelector("button").addEventListener("click", downloadVideo);
 
-      const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-      });
-      if (params.url?.length) {
-        downloadVideo(params.url);
+      const params = new URLSearchParams(document.location.search);
+
+      if (params.get("url")?.length) {
+        downloadVideo(params.get("url"));
       }
       async function downloadVideo(initialURL) {
         let url = document.querySelector("input").value;
