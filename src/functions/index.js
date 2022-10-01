@@ -126,6 +126,7 @@ exports.video = functions
     }
     if (!url?.length || !url.toLowerCase().includes("medal"))
       return res.json({ valid: false });
+    if (!url.toLowerCase().includes("?theater=true")) url += "?theater=true";
     try {
       const src = await getFileURL(req.body.url);
       if (src) return res.json({ valid: true, src });

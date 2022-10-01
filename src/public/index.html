@@ -105,7 +105,7 @@
     <p style="display: none; font-size: x-large" id="loading">Loading.</p>
     <h6
       style="
-        position: absolute;
+        position: sticky;
         bottom: 0;
         right: 0;
         text-align: left;
@@ -113,6 +113,7 @@
       "
     >
       <a
+        target="_blank"
         style="text-decoration: none; display: inline; color: inherit"
         href="https://github.com/Tyson3101"
       >
@@ -138,6 +139,8 @@
           return alert("Medal clip already downloading/downloaded!");
         if (!url.length || !url.toLowerCase().includes("medal"))
           return alert("Please input a vaild medal clip!");
+        if (!url.toLowerCase().includes("?theater=true"))
+          url += "?theater=true";
         lastURLs.push(url);
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
