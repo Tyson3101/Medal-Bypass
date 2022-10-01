@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Medal Bypass</title>
     <meta name="title" content="Medal Bypass" />
-    <meta name="description" content="Download Medal Clips Easily!" />
+    <meta
+      name="description"
+      content="Download Medal Clips Easily Without Watermarks!"
+    />
     <meta name="theme-color" content="#553EA8" />
     <meta
       name="keywords"
@@ -29,6 +32,16 @@
         font-family: Arial, Helvetica, sans-serif;
         color: rgb(0, 183, 134);
         background-color: rgb(29, 25, 25);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+      }
+      video {
+        width: 40vw;
+        height: auto;
+        aspect-ratio: 16 / 9;
       }
       a {
         display: block;
@@ -64,13 +77,22 @@
         margin-bottom: 0;
         font-size: 3rem;
       }
+      .countdown {
+        margin: 0;
+      }
+      @media (max-width: 517px) {
+        .countdown {
+          font-size: 3vw;
+          transform: scaleY(1.3);
+        }
+      }
     </style>
   </head>
   <body>
     <h1 aria-label="Header">Medal Bypass</h1>
     <span id="desc" aria-label="Description"
-      >Bypasses the requirement of Medal Premium in order to download
-      clips!</span
+      >Bypasses the requirement of Medal Premium in order to download clips
+      without watermarks!</span
     >
     <input
       type="text"
@@ -82,55 +104,79 @@
     <button aria-label="Download Medal Clip">Download</button>
     <p style="display: none; font-size: x-large" id="loading">Loading...</p>
     <script>
-      let lastURL = "";
+      let lastURLs = [];
       const loading = document.querySelector("p");
       document.querySelector("button").addEventListener("click", downloadVideo);
-
       const params = new URLSearchParams(document.location.search);
-
       if (params.get("url")?.length) {
         downloadVideo(params.get("url"));
       }
+
       async function downloadVideo(initialURL) {
         let url = document.querySelector("input").value;
         if (initialURL?.length) {
           url = initialURL;
         }
-        console.log({ url });
-        if (lastURL === url && url.length)
-          return alert("Medal clip already downloading/downloaded");
-        if (!url.length) return alert("... ?");
-        lastURL = url;
+        if (lastURLs.includes(url))
+          return alert("Medal clip already downloading/downloaded!");
+        if (!url.length || !url.toLowerCase().includes("medal"))
+          return alert("Please input a vaild medal clip!");
+        lastURLs.push(url);
         const videoElement = document.createElement("video");
-        videoElement.style.width = "40vw";
-        videoElement.style.height = "auto";
-        videoElement.style.aspectRatio = "16 / 9";
         const aElement = document.createElement("a");
+        const pElement = document.createElement("p");
+        pElement.classList.add("countdown");
+        aElement.target = "_blank";
         aElement.download = "MedalDownload";
         aElement.innerText = "Download Here";
         const data = { url };
         loading.style.display = "block";
-        const fetchData = await fetch(
-          "https://us-central1-medalbypass.cloudfunctions.net/video",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          }
-        );
-        const video = await fetchData.json();
-        loading.style.display = "none";
-        if (!video.valid)
-          return alert(
-            "Please input a vaild Medal clip! (Make sure it's not unlisted, etc..)"
+        try {
+          const fetchData = await fetch(
+            "https://us-central1-medalbypass.cloudfunctions.net/video",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            }
           );
-        if (video.src.includes("cdn.medal.tv/")) aElement.target = "_blank";
-        aElement.href = video.src;
-        videoElement.src = video.src;
-        videoElement.controls = true;
-        document.body.appendChild(aElement);
-        document.body.appendChild(videoElement);
-        console.log("Done");
+          const video = await fetchData.json();
+          loading.style.display = "none";
+          if (!video.valid)
+            return alert(
+              "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
+            );
+          aElement.href = video.src;
+          videoElement.src = video.src;
+          videoElement.controls = true;
+          document.body.appendChild(aElement);
+          document.body.appendChild(videoElement);
+          document.body.appendChild(pElement);
+          startCountdown({ pElement, aElement, videoElement });
+        } catch {
+          return alert(
+            "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
+          );
+        }
+      }
+
+      function startCountdown({ pElement, aElement, videoElement }) {
+        if (!pElement) return;
+        let seconds = 890;
+        let interval = setInterval(() => {
+          seconds -= 1;
+          pElement.innerText = `Time left to download: ${Math.floor(
+            seconds / 60
+          )}:${
+            `${seconds % 60}`.length === 2 ? seconds % 60 : "0" + (seconds % 60)
+          }`;
+          if (seconds <= 0) {
+            pElement.remove();
+            aElement?.remove();
+            videoElement?.remove();
+            clearInterval(interval);
+          }
+        }, 1000);
       }
     </script>
   </body>

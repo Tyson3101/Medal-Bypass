@@ -104,8 +104,7 @@ function getFileURL(url) {
           resolve(src);
         }
       }, 7000);
-    } catch (e) {
-      console.log("Error!", e);
+    } catch {
       r();
     }
   });
@@ -125,8 +124,8 @@ exports.video = functions
     if (req.method.toLowerCase() === "GET") {
       url = req.query.url;
     }
-    if (!url) return res.json({ valid: false });
-    console.log("Start /video Request");
+    if (!url?.length || !url.toLowerCase().includes("medal"))
+      return res.json({ valid: false });
     try {
       const src = await getFileURL(req.body.url);
       if (src) return res.json({ valid: true, src });

@@ -2,11 +2,11 @@
 
 ### What
 
-##### A tool to download Medal clips!
+##### A tool to download Medal clips without watermarks!
 
 ### Why
 
-##### Medal has a paywall in the way of download clips...
+##### Medal has a paywall in the way of downloading clips without watermaks...
 
 ### How
 
