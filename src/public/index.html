@@ -102,8 +102,25 @@
       placeholder="Copy and Paste Medal Clip Here"
     />
     <button aria-label="Download Medal Clip">Download</button>
-    <p style="display: none; font-size: x-large" id="loading">Loading...</p>
+    <p style="display: none; font-size: x-large" id="loading">Loading.</p>
+    <h6
+      style="
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        text-align: left;
+        margin-right: 1em;
+      "
+    >
+      <a
+        style="text-decoration: none; display: inline; color: inherit"
+        href="https://github.com/Tyson3101"
+      >
+        By Tyson3101</a
+      >
+    </h6>
     <script>
+      let loadingInterval;
       let lastURLs = [];
       const loading = document.querySelector("p");
       document.querySelector("button").addEventListener("click", downloadVideo);
@@ -130,7 +147,7 @@
         aElement.download = "MedalDownload";
         aElement.innerText = "Download Here";
         const data = { url };
-        loading.style.display = "block";
+        startLoading();
         try {
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/video",
@@ -141,7 +158,7 @@
             }
           );
           const video = await fetchData.json();
-          loading.style.display = "none";
+          stopLoading();
           if (!video.valid)
             return alert(
               "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
@@ -177,6 +194,21 @@
             clearInterval(interval);
           }
         }, 1000);
+      }
+
+      function startLoading() {
+        if (loadingInterval) clearInterval(loadingInterval);
+        loading.style.display = "block";
+        let numOfDots = 1;
+        loadingInterval = setInterval(() => {
+          numOfDots += 1;
+          if (numOfDots >= 4) numOfDots = 1;
+          loading.innerText = "Loading" + ".".repeat(numOfDots);
+        }, 500);
+      }
+      function stopLoading() {
+        if (loadingInterval) clearInterval(loadingInterval);
+        loading.style.display = "none";
       }
     </script>
   </body>

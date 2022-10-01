@@ -44,9 +44,9 @@ function getFileURL(url) {
           if (request.url.includes("master.m3u8") && !fileFound) {
             functions.logger.log(request.url);
             fileFound = true;
-            const randomNumber = `${Math.random() * 99999}`.replace(".", "_");
-            const bucketFileName = "temp" + randomNumber + ".mp4";
-            const fileName = "/" + bucketFileName;
+            const randomNumber = `${Math.random() * 999999}`.replace(".", "_");
+            const bucketFileName = "Medal_Clip_" + randomNumber + ".mp4";
+            const fileName = "/temp" + bucketFileName;
             const fileDirName = os.tmpdir() + fileName;
             converter
               .setInputFile(request.url)
