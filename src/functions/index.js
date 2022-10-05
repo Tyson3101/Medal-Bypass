@@ -14,6 +14,13 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const bucket = admin.app().storage().bucket("medalbypass.appspot.com");
+bucket
+  .addLifecycleRule({
+    action: "delete",
+    condition: { age: 1 },
+  })
+  .then(() => console.log("Changed Rules."))
+  .catch(console.error);
 
 function getFileURL(url) {
   let fileFound = false;
@@ -63,12 +70,7 @@ function getFileURL(url) {
                 const url = clipMetaData.mediaLink;
                 await browser.close();
                 await fs.unlink(fileDirName);
-                setTimeout(() => {
-                  bucket
-                    .file(bucketFileName)
-                    .delete()
-                    .catch((e) => e);
-                }, 60000 * 15);
+
                 resolve(url);
               });
           }
@@ -129,8 +131,9 @@ exports.video = functions
     if (!url.toLowerCase().includes("?theater=true")) url += "?theater=true";
     try {
       const src = await getFileURL(req.body.url);
-      if (src) return res.json({ valid: true, src });
-      else throw new Error("No data");
+      if (src) {
+        return res.json({ valid: true, src });
+      } else throw new Error("No data");
     } catch (e) {
       console.log(e);
       return res.json({ valid: false });

@@ -42,6 +42,7 @@
         width: 40vw;
         height: auto;
         aspect-ratio: 16 / 9;
+        margin-bottom: 1em;
       }
       a {
         display: block;
@@ -77,16 +78,6 @@
         margin-bottom: 0;
         font-size: 3rem;
       }
-      .countdown {
-        margin: 0;
-        margin-bottom: 1em;
-      }
-      @media (max-width: 517px) {
-        .countdown {
-          font-size: 3vw;
-          transform: scaleY(1.3);
-        }
-      }
     </style>
   </head>
   <body>
@@ -103,7 +94,13 @@
       placeholder="Copy and Paste Medal Clip Here"
     />
     <button aria-label="Download Medal Clip">Download</button>
-    <p style="display: none; font-size: x-large" id="loading">Loading.</p>
+    <p
+      style="display: none; font-size: x-large"
+      id="loading"
+      aria-label="Loading"
+    >
+      Loading.
+    </p>
     <h6
       style="
         position: fixed;
@@ -114,6 +111,7 @@
       "
     >
       <a
+        aria-label="Github Page"
         target="_blank"
         style="text-decoration: none; display: inline; color: inherit"
         href="https://github.com/Tyson3101"
@@ -145,8 +143,6 @@
         lastURLs.push(url);
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
-        const pElement = document.createElement("p");
-        pElement.classList.add("countdown");
         aElement.target = "_blank";
         aElement.download = "MedalDownload";
         aElement.innerText = "Download Here";
@@ -172,34 +168,12 @@
           videoElement.controls = true;
           document.body.appendChild(aElement);
           document.body.appendChild(videoElement);
-          document.body.appendChild(pElement);
-          startCountdown({ pElement, aElement, videoElement });
         } catch {
           return alert(
             "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
           );
         }
       }
-
-      function startCountdown({ pElement, aElement, videoElement }) {
-        if (!pElement) return;
-        let seconds = 890;
-        let interval = setInterval(() => {
-          seconds -= 1;
-          pElement.innerText = `Time left to download: ${Math.floor(
-            seconds / 60
-          )}:${
-            `${seconds % 60}`.length === 2 ? seconds % 60 : "0" + (seconds % 60)
-          }`;
-          if (seconds <= 0) {
-            pElement.remove();
-            aElement?.remove();
-            videoElement?.remove();
-            clearInterval(interval);
-          }
-        }, 1000);
-      }
-
       function startLoading() {
         if (loadingInterval) clearInterval(loadingInterval);
         loading.style.display = "block";
