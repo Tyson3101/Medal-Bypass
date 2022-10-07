@@ -123,7 +123,8 @@
       let loadingInterval;
       let lastURLs = [];
       const loading = document.querySelector("p");
-      document.querySelector("button").addEventListener("click", downloadVideo);
+      const button = document.querySelector("button");
+      button.addEventListener("click", downloadVideo);
       const params = new URLSearchParams(document.location.search);
       if (params.get("url")?.length) {
         downloadVideo(params.get("url"));
@@ -134,13 +135,30 @@
         if (initialURL?.length) {
           url = initialURL;
         }
-        if (lastURLs.includes(url))
-          return alert("Medal clip already downloading/downloaded!");
-        if (!url.length || !url.toLowerCase().includes("medal"))
+        if (
+          !url.length ||
+          (!url.toLowerCase().includes("medal") &&
+            !url.toLowerCase().includes("clips"))
+        )
           return alert("Please input a vaild medal clip!");
         if (!url.toLowerCase().includes("?theater=true"))
           url += "?theater=true";
-        lastURLs.push(url);
+        if (
+          lastURLs.some(
+            (u) =>
+              url
+                .split("/clips/")[1]
+                .split("/")[0]
+                .replace("?theater=true", "")
+                .toLowerCase() ===
+              u
+                .split("/clips/")[1]
+                .split("/")[0]
+                .replace("?theater=true", "")
+                .toLowerCase()
+          )
+        )
+          return alert("Medal clip already downloading/downloaded!");
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
         aElement.target = "_blank";
@@ -148,6 +166,7 @@
         aElement.innerText = "Download Here";
         const data = { url };
         startLoading();
+        button.innerText = "Download a Different Clip";
         try {
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/video",
@@ -156,21 +175,23 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(data),
             }
-          );
+          ).catch((e) => e);
           const video = await fetchData.json();
           stopLoading();
-          if (!video.valid)
+          if (!video?.valid)
             return alert(
-              "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
+              "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
             );
           aElement.href = video.src;
           videoElement.src = video.src;
           videoElement.controls = true;
           document.body.appendChild(aElement);
           document.body.appendChild(videoElement);
+          lastURLs.push(url);
         } catch {
+          stopLoading();
           return alert(
-            "Please input a vaild Medal clip! (Make sure it's not private, etc..)"
+            "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
           );
         }
       }

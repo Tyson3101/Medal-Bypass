@@ -14,13 +14,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const bucket = admin.app().storage().bucket("medalbypass.appspot.com");
-bucket
-  .addLifecycleRule({
-    action: "delete",
-    condition: { age: 1 },
-  })
-  .then(() => console.log("Changed Rules."))
-  .catch(console.error);
 
 function getFileURL(url) {
   let fileFound = false;
@@ -47,14 +40,30 @@ function getFileURL(url) {
 
       client.on(
         "Network.requestIntercepted",
-        async ({ interceptionId, request, responseHeaders, resourceType }) => {
+        async ({ interceptionId, request }) => {
           if (request.url.includes("master.m3u8") && !fileFound) {
             functions.logger.log(request.url);
             fileFound = true;
-            const randomNumber = `${Math.random() * 999999}`.replace(".", "_");
-            const bucketFileName = "Medal_Clip_" + randomNumber + ".mp4";
+            const urlId = url
+              .split("/clips/")[1]
+              .split("/")[0]
+              .replace("?theater=true", "");
+            const id = urlId?.length
+              ? urlId
+              : `${Math.random() * 999999}`.replace(".", "_");
+            const bucketFileName = "Medal_Clip_" + id + ".mp4";
             const fileName = "/temp" + bucketFileName;
             const fileDirName = os.tmpdir() + fileName;
+            try {
+              const bucketFile = bucket.file(bucketFileName);
+              if (bucketFile?.name) {
+                if (!(await bucketFile.isPublic()))
+                  await bucketFile.makePublic();
+                const [metadata] = await bucketFile.getMetadata();
+                const publicSrcUrl = metadata.mediaLink;
+                if (publicSrcUrl) return resolve(publicSrcUrl);
+              }
+            } catch {}
             converter
               .setInputFile(request.url)
               .setOutputFile(fileDirName)
@@ -67,13 +76,15 @@ function getFileURL(url) {
                 await uploadClipResponse[0].makePublic();
                 const [clipMetaData] =
                   await uploadClipResponse[0].getMetadata();
-                const url = clipMetaData.mediaLink;
+                const publicSrcUrl = clipMetaData.mediaLink;
                 await browser.close();
                 await fs.unlink(fileDirName);
 
-                resolve(url);
-              });
+                resolve(publicSrcUrl);
+              })
+              .catch(r);
           }
+
           if (interceptionId)
             client.send("Network.continueInterceptedRequest", {
               interceptionId,
@@ -115,7 +126,7 @@ function getFileURL(url) {
 exports.video = functions
   .runWith({
     timeoutSeconds: 300,
-    memory: "1GB",
+    memory: "4GB",
   })
   .https.onRequest(async (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
