@@ -119,9 +119,12 @@
         By Tyson3101</a
       >
     </h6>
+    <div id="videos"></div>
     <script>
       let loadingInterval;
       let lastURLs = [];
+      let cooldown = 0;
+      const videosContainer = document.querySelector("#videos");
       const loading = document.querySelector("p");
       const button = document.querySelector("button");
       button.addEventListener("click", downloadVideo);
@@ -151,7 +154,7 @@
                 .split("/")[0]
                 .replace("?theater=true", "")
                 .toLowerCase() ===
-              u
+              u.url
                 .split("/clips/")[1]
                 .split("/")[0]
                 .replace("?theater=true", "")
@@ -159,6 +162,11 @@
           )
         )
           return alert("Medal clip already downloading/downloaded!");
+        if (cooldown > 0) return alert("Please wait " + cooldown + " seconds.");
+        cooldown = 6;
+        button.disabled = true;
+        button.style.cursor = "not-allowed";
+        lastURLs.push({ url, active: true });
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
         aElement.target = "_blank";
@@ -166,7 +174,7 @@
         aElement.innerText = "Download Here";
         const data = { url };
         startLoading();
-        button.innerText = "Download a Different Clip";
+        button.innerText = "Download Another Clip";
         try {
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/video",
@@ -177,18 +185,27 @@
             }
           ).catch((e) => e);
           const video = await fetchData.json();
+          lastURLs[lastURLs.findIndex((u) => u.url === url)].active = false;
           stopLoading();
-          if (!video?.valid)
+          if (!video?.valid) {
+            lastURLs.splice(
+              lastURLs.findIndex((u) => u.url === url),
+              1
+            );
             return alert(
               "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
             );
+          }
           aElement.href = video.src;
           videoElement.src = video.src;
           videoElement.controls = true;
-          document.body.appendChild(aElement);
-          document.body.appendChild(videoElement);
-          lastURLs.push(url);
+          videosContainer.prepend(videoElement);
+          videosContainer.prepend(aElement);
         } catch {
+          lastURLs.splice(
+            lastURLs.findIndex((u) => u.url === url),
+            1
+          );
           stopLoading();
           return alert(
             "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
@@ -206,9 +223,21 @@
         }, 500);
       }
       function stopLoading() {
+        if (lastURLs.some((u) => u.active)) return;
         if (loadingInterval) clearInterval(loadingInterval);
         loading.style.display = "none";
       }
+
+      setInterval(() => {
+        if (cooldown > 0) {
+          button.disabled = true;
+          button.style.cursor = "not-allowed";
+          cooldown--;
+        } else {
+          button.disabled = false;
+          button.style.cursor = "pointer";
+        }
+      }, 1000);
     </script>
   </body>
 </html>
