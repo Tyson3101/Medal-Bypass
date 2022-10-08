@@ -55,7 +55,7 @@ function getFileURL(url, page, browser, client) {
       client.on(
         "Network.requestIntercepted",
         async ({ interceptionId, request }) => {
-          if (request.url.includes("master.m3u8") && !fileFound) {
+          if (request.url.toLowerCase().includes("master.m3u8") && !fileFound) {
             functions.logger.log(request.url);
             fileFound = true;
             const urlId = url
@@ -188,19 +188,23 @@ exports.video = functions
     res.set("Access-Control-Allow-Headers", "Content-Type");
     res.set("Access-Control-Max-Age", "3600");
     let url = req.body.url;
-    if (req.method.toLowerCase() === "GET") {
+    if (req.method === "GET") {
       url = req.query.url;
     }
-    if (!url?.length || !url.toLowerCase().includes("medal"))
+    if (
+      !url?.length ||
+      !url.toLowerCase().includes("medal") ||
+      !url.toLowerCase().includes("clips")
+    )
       return res.json({ valid: false });
     if (!url.toLowerCase().includes("?theater=true")) url += "?theater=true";
+    if (!url.toLowerCase().startsWith("https://")) url = "https://" + url;
     try {
       const src = await startFileGet(req.body.url);
       if (src) {
         return res.json({ valid: true, src });
-      } else throw new Error("No data");
+      } else res.json({ valid: false });
     } catch (e) {
-      console.log(e);
       return res.json({ valid: false });
     }
   });

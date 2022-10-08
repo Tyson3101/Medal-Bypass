@@ -146,19 +146,20 @@
           return alert("Please input a vaild medal clip!");
         if (!url.toLowerCase().includes("?theater=true"))
           url += "?theater=true";
+        if (!url.toLowerCase().startsWith("https://")) url = "https://" + url;
         if (
           lastURLs.some(
             (u) =>
               url
-                .split("/clips/")[1]
-                .split("/")[0]
-                .replace("?theater=true", "")
-                .toLowerCase() ===
-              u.url
-                .split("/clips/")[1]
-                .split("/")[0]
-                .replace("?theater=true", "")
                 .toLowerCase()
+                .split("/clips/")[1]
+                .split("/")[0]
+                .replace("?theater=true", "") ===
+              u.url
+                .toLowerCase()
+                .split("/clips/")[1]
+                .split("/")[0]
+                .replace("?theater=true", "")
           )
         )
           return alert("Medal clip already downloading/downloaded!");
@@ -166,6 +167,7 @@
         cooldown = 6;
         button.disabled = true;
         button.style.cursor = "not-allowed";
+        button.innerText = "Wait " + cooldown + " seconds!";
         lastURLs.push({ url, active: true });
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
@@ -174,7 +176,6 @@
         aElement.innerText = "Download Here";
         const data = { url };
         startLoading();
-        button.innerText = "Download Another Clip";
         try {
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/video",
@@ -184,7 +185,7 @@
               body: JSON.stringify(data),
             }
           ).catch((e) => e);
-          const video = await fetchData.json();
+          const video = await fetchData?.json();
           lastURLs[lastURLs.findIndex((u) => u.url === url)].active = false;
           stopLoading();
           if (!video?.valid) {
@@ -232,10 +233,12 @@
         if (cooldown > 0) {
           button.disabled = true;
           button.style.cursor = "not-allowed";
+          button.innerText = "Wait " + cooldown + " seconds!";
           cooldown--;
         } else {
           button.disabled = false;
           button.style.cursor = "pointer";
+          button.innerText = "Download Another Clip";
         }
       }, 1000);
     </script>
