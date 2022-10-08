@@ -238,7 +238,8 @@
         } else {
           button.disabled = false;
           button.style.cursor = "pointer";
-          button.innerText = "Download Another Clip";
+          if (button.innerText !== "Download")
+            button.innerText = "Download Another Clip";
         }
       }, 1000);
     </script>
