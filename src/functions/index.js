@@ -75,7 +75,10 @@ function getFileURL(url, page, browser, client) {
                   await bucketFile.makePublic();
                 const [metadata] = await bucketFile.getMetadata();
                 const publicSrcUrl = metadata.mediaLink;
-                if (publicSrcUrl) return resolve(publicSrcUrl);
+                if (publicSrcUrl) {
+                  await browser.close();
+                  return resolve(publicSrcUrl);
+                }
               }
             } catch {}
             converter
@@ -96,7 +99,10 @@ function getFileURL(url, page, browser, client) {
 
                 resolve(publicSrcUrl);
               })
-              .catch(reject);
+              .catch(async () => {
+                await browser.close();
+                reject();
+              });
           }
 
           if (interceptionId) {
@@ -120,6 +126,7 @@ function getFileURL(url, page, browser, client) {
         await page.waitForSelector("video");
         await page.waitForSelector(logInAtagSelector);
       } catch {
+        await browser.close();
         reject();
       }
       const initalSrc = await page.evaluate(
@@ -162,6 +169,7 @@ function getFileURL(url, page, browser, client) {
             }
           }, 1000);
         } catch {
+          await browser.close();
           reject();
         }
       }
@@ -172,6 +180,7 @@ function getFileURL(url, page, browser, client) {
         }
       }, 2500);
     } catch (e) {
+      await browser.close();
       reject();
     }
   });
