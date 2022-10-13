@@ -12,6 +12,7 @@ puppeteer.use(stealth);
 
 const serviceAccount = require("./serviceAccountKey.json");
 
+// Initialize Firebase Bucket
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -19,6 +20,7 @@ const bucket = admin.app().storage().bucket("medalbypass.appspot.com");
 
 async function startFileGet(url) {
   try {
+    // Create Browser and Page
     const browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
@@ -51,10 +53,11 @@ function getFileURL(url, page, browser, client) {
           },
         ],
       });
-
+      // Listens for netowrk requests
       client.on(
         "Network.requestIntercepted",
         async ({ interceptionId, request }) => {
+          // Checks if master.m3u8 (The file of medal clip)
           if (request.url.toLowerCase().includes("master.m3u8") && !fileFound) {
             functions.logger.log(request.url);
             fileFound = true;
@@ -69,6 +72,7 @@ function getFileURL(url, page, browser, client) {
             const fileName = "/temp" + bucketFileName;
             const fileDirName = os.tmpdir() + fileName;
             try {
+              // Checks if already converted
               const bucketFile = bucket.file(bucketFileName);
               if (bucketFile?.name) {
                 if (!(await bucketFile.isPublic()))
@@ -77,15 +81,18 @@ function getFileURL(url, page, browser, client) {
                 const publicSrcUrl = metadata.mediaLink;
                 if (publicSrcUrl) {
                   await browser.close();
+                  // Sends download link
                   return resolve(publicSrcUrl);
                 }
               }
             } catch {}
+            // Converts m3u8 file to mp4
             converter
               .setInputFile(request.url)
               .setOutputFile(fileDirName)
               .start()
               .then(async () => {
+                // Uploads file to firebase storage, because of 10mb response limit
                 const uploadClipResponse = await bucket.upload(fileDirName, {
                   destination: bucketFileName,
                 });
@@ -96,7 +103,7 @@ function getFileURL(url, page, browser, client) {
                 const publicSrcUrl = clipMetaData.mediaLink;
                 await browser.close();
                 await fs.unlink(fileDirName);
-
+                // Sends download link
                 resolve(publicSrcUrl);
               })
               .catch(async () => {
@@ -116,6 +123,7 @@ function getFileURL(url, page, browser, client) {
       );
       client.on("error", () => {});
       setTimeout(async () => {
+        // If nothing found within 15 secs, stop.
         if (!fileFound && !cdnURLFound && !privateFound) {
           await browser.close();
           reject();
@@ -129,21 +137,25 @@ function getFileURL(url, page, browser, client) {
         await browser.close();
         reject();
       }
+      // For older clips that already have the mp4 embedded or to see if need to login to see
       const initalSrc = await page.evaluate(
         () =>
           document.querySelector("video")?.src ||
           document.querySelector("source")?.src
       );
+      // Check if it is the medal source url
       if (checkIfMedalClipCDN(initalSrc)) {
         cdnURLFound = true;
         cdnURL = initalSrc;
         clearInterval(interval);
       }
+      // Private (need to log in to see)
       if (
         initalSrc.toLowerCase().split("?info")[0] ===
         "https://cdn.medal.tv/assets/video/privacy-protected-guest-720p.c4821e1e.mp4"
       ) {
         privateFound = true;
+        // Logs in
         await page.click(logInAtagSelector);
         const userNameSelector = "#username > div > input";
         const passwordSelector = "input[data-testid='password-field']";
@@ -156,6 +168,7 @@ function getFileURL(url, page, browser, client) {
         await frame.click("button[data-testid='log-in-button']");
         try {
           await page.waitForNavigation({ timeout: 10000 });
+          // Finds the source url
           interval = setInterval(async () => {
             const checkSrc = await page.evaluate(
               () =>
@@ -173,13 +186,8 @@ function getFileURL(url, page, browser, client) {
           reject();
         }
       }
-      setTimeout(async () => {
-        if (!fileFound && cdnURLFound && !privateFound) {
-          await browser.close();
-          resolve(cdnURL);
-        }
-      }, 2500);
     } catch (e) {
+      // If errors (#rip)
       await browser.close();
       reject();
     }
@@ -189,9 +197,10 @@ function getFileURL(url, page, browser, client) {
 exports.video = functions
   .runWith({
     timeoutSeconds: 300,
-    memory: "4GB",
+    memory: "4GB", // For big clips
   })
   .https.onRequest(async (req, res) => {
+    // Cors
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST");
     res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -200,6 +209,7 @@ exports.video = functions
     if (req.method === "GET") {
       url = req.query.url;
     }
+    // Checks if vaild url
     if (
       !url?.length ||
       !url.toLowerCase().includes("medal") ||
@@ -218,6 +228,7 @@ exports.video = functions
     }
   });
 
+// Checks if medal clip
 function checkIfMedalClipCDN(str) {
   if (!str) return false;
   if (!str?.toLowerCase().includes("cdn.medal.tv/")) return false;

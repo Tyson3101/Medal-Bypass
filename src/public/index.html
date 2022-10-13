@@ -140,6 +140,7 @@
         if (initialURL?.length) {
           url = initialURL;
         }
+        // Checks if vaild url
         if (
           !url.length ||
           (!url.toLowerCase().includes("medal") &&
@@ -149,6 +150,7 @@
         if (!url.toLowerCase().includes("?theater=true"))
           url += "?theater=true";
         if (!url.toLowerCase().startsWith("https://")) url = "https://" + url;
+        // Check if downloading or is already downlowaed
         if (
           lastURLs.some(
             (u) =>
@@ -170,7 +172,7 @@
         button.disabled = true;
         button.style.cursor = "not-allowed";
         button.innerText = "Wait " + cooldown + " seconds!";
-        lastURLs.push({ url, active: true });
+        lastURLs.push({ url, active: true }); // History of clips
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
         aElement.target = "_blank";
@@ -179,6 +181,7 @@
         const data = { url };
         startLoading();
         try {
+          // Sends URL to server to download clip without watermark
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/video",
             {
@@ -187,31 +190,35 @@
               body: JSON.stringify(data),
             }
           ).catch((e) => e);
-          const video = await fetchData?.json();
-          lastURLs[lastURLs.findIndex((u) => u.url === url)].active = false;
+          const video = await fetchData?.json(); // Returns download link
+          lastURLs[lastURLs.findIndex((u) => u.url === url)].active = false; // Edits history to link toggle link to done
           stopLoading();
+          // Checks if vaild
           if (!video?.valid) {
+            // Remove url from history
             lastURLs.splice(
               lastURLs.findIndex((u) => u.url === url),
               1
             );
             return alert(
-              "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
+              "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a couple of seconds and retry!"
             );
           }
+          // Adds download btn and video to screen
           aElement.href = video.src;
           videoElement.src = video.src;
           videoElement.controls = true;
           videosContainer.prepend(videoElement);
           videosContainer.prepend(aElement);
         } catch {
+          // FOR ERRORS!
           lastURLs.splice(
             lastURLs.findIndex((u) => u.url === url),
             1
           );
           stopLoading();
           return alert(
-            "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a second and retry!"
+            "Please input a vaild Medal clip! (Make sure it's not private, etc..)\nOR Please give it a couple of seconds and retry!"
           );
         }
       }
@@ -231,6 +238,7 @@
         loading.style.display = "none";
       }
 
+      // Cooldown
       setInterval(() => {
         if (cooldown > 0) {
           button.disabled = true;
@@ -244,6 +252,8 @@
             button.innerText = "Download Another Clip";
         }
       }, 1000);
+
+      // What you looking in here for ?!
     </script>
   </body>
 </html>
