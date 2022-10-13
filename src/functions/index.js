@@ -186,6 +186,13 @@ function getFileURL(url, page, browser, client) {
           reject();
         }
       }
+      // Incase found false link
+      setTimeout(async () => {
+        if (!fileFound && cdnURLFound && !privateFound) {
+          await browser.close();
+          resolve(cdnURL);
+        }
+      }, 2500);
     } catch (e) {
       // If errors (#rip)
       await browser.close();
