@@ -17,6 +17,13 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const bucket = admin.app().storage().bucket("medalbypass.appspot.com");
+// Auto Delete Files after 1 day (minimum)
+bucket
+  .addLifecycleRule({
+    action: "delete",
+    condition: { age: 1 },
+  })
+  .catch(console.error);
 
 async function startFileGet(url) {
   try {
@@ -128,6 +135,13 @@ function getFileURL(url, page, browser, client) {
           await browser.close();
           reject();
         }
+        setTimeout(async () => {
+          // If no clip found within 30 secs, stop.
+          if (!fileFound && !cdnURLFound) {
+            await browser.close();
+            reject();
+          }
+        }, 15000);
       }, 15000);
       try {
         await page.goto(url, { waitUntil: "load" });
@@ -201,6 +215,7 @@ function getFileURL(url, page, browser, client) {
   });
 }
 
+// HTTP endpoint /video
 exports.video = functions
   .runWith({
     timeoutSeconds: 300,
@@ -239,11 +254,7 @@ exports.video = functions
 function checkIfMedalClipCDN(str) {
   if (!str) return false;
   if (!str?.toLowerCase().includes("cdn.medal.tv/")) return false;
-  if (
-    str.toLowerCase().split("?info")[0] ===
-    "https://cdn.medal.tv/assets/video/privacy-protected-guest-720p.c4821e1e.mp4"
-  )
-    return false;
+  if (str.toLowerCase().includes("privacy-protected-guest")) return false;
   if (str?.toLowerCase().includes("cdn.medal.tv/source/")) return true;
   else if (
     str?.toLowerCase().includes("720p") ||
