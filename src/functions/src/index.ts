@@ -1,20 +1,29 @@
-require("dotenv").config();
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const os = require("os");
-const chromium = require("chrome-aws-lambda");
-const fs = require("fs/promises");
-const m3u8ToMp4 = require("m3u8-to-mp4");
+import dotenv from "dotenv";
+dotenv.config();
+import functions, { Response } from "firebase-functions";
+import admin from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
+import os from "os";
+import chromium from "chrome-aws-lambda";
+import fs from "fs/promises";
+import { readFileSync } from "fs";
+import m3u8ToMp4 from "m3u8-to-mp4";
 const converter = new m3u8ToMp4();
-const puppeteer = require("puppeteer-extra");
-const stealth = require("puppeteer-extra-plugin-stealth")();
+import puppeteer from "puppeteer-extra";
+import { Page, Browser, CDPSession } from "puppeteer";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import { Request } from "firebase-functions/lib/common/providers/https";
+const stealth = StealthPlugin();
 puppeteer.use(stealth);
 
-const serviceAccount = require("./serviceAccountKey.json");
+const loadJSON = (path: string) =>
+  JSON.parse(readFileSync(new URL(path, import.meta.url)).toString());
+
+const serviceAccount = loadJSON("./serviceAccountKey.json");
 
 // Initialize Firebase Bucket
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+initializeApp({
+  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
 });
 const bucket = admin.app().storage().bucket("medalbypass.appspot.com");
 // Auto Delete Files after 1 day (minimum)
@@ -25,7 +34,7 @@ bucket
   })
   .catch(console.error);
 
-async function startFileGet(url) {
+async function startFileGet(url: string) {
   try {
     // Create Browser and Page
     const browser = await puppeteer.launch({
@@ -42,14 +51,19 @@ async function startFileGet(url) {
   }
 }
 
-function getFileURL(url, page, browser, client) {
+function getFileURL(
+  url: string,
+  page: Page,
+  browser: Browser,
+  client: CDPSession
+) {
   const logInAtagSelector =
     "#__next > div > div.deviceSize__Desktop-sc-1wgp2re-0.clmXhW > nav > div.StyledBox-sc-13pk1d4-0.ZIwwl > div.StyledBox-sc-13pk1d4-0.lfUOxE > a:nth-child(5)";
   let privateFound = false;
   let fileFound = false;
   let cdnURLFound = false;
   let cdnURL = "";
-  let interval;
+  let interval: any;
   return new Promise(async (resolve, reject) => {
     try {
       await client.send("Network.enable");
@@ -216,12 +230,12 @@ function getFileURL(url, page, browser, client) {
 }
 
 // HTTP endpoint /video
-exports.video = functions
+const video = functions
   .runWith({
     timeoutSeconds: 300,
     memory: "4GB", // For big clips
   })
-  .https.onRequest(async (req, res) => {
+  .https.onRequest(async (req: Request, res: Response): Promise<any> => {
     // Cors
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST");
@@ -250,8 +264,10 @@ exports.video = functions
     }
   });
 
+export { video };
+
 // Checks if medal clip
-function checkIfMedalClipCDN(str) {
+function checkIfMedalClipCDN(str: string): boolean {
   if (!str) return false;
   if (!str?.toLowerCase().includes("cdn.medal.tv/")) return false;
   if (str.toLowerCase().includes("privacy-protected-guest")) return false;
