@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "module": "ES2020",
+    "moduleResolution": "classic",
+    "target": "ES2021",
+    "rootDir": "./src",
+    "outDir": "./dist"
+  }
+}
