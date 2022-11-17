@@ -166,10 +166,24 @@ function getFileURL(
         reject();
       }
       // For older clips that already have the mp4 embedded or to see if need to login to see
+      // Waits for video element to be found
+      try {
+        await page.waitForSelector("[id*='feed-clip-player'] video", {
+          timeout: 15000,
+        });
+      } catch {
+        // If no video found: Goodbye
+        await browser.close();
+        reject();
+      }
       const initalSrc = await page.evaluate(
         () =>
-          document.querySelector("video")?.src ||
-          document.querySelector("source")?.src
+          document
+            .querySelector("[id*='feed-clip-player']")
+            .querySelector("video")?.src ||
+          document
+            .querySelector("[id*='feed-clip-player']")
+            .querySelector("source")?.src
       );
       // Check if it is the medal source url
       if (checkIfMedalClipCDN(initalSrc)) {
@@ -200,8 +214,12 @@ function getFileURL(
           interval = setInterval(async () => {
             const checkSrc = await page.evaluate(
               () =>
-                document.querySelector("video")?.src ||
-                document.querySelector("source")?.src
+                document
+                  .querySelector("[id*='feed-clip-player']")
+                  .querySelector("video")?.src ||
+                document
+                  .querySelector("[id*='feed-clip-player']")
+                  .querySelector("source")?.src
             );
             if (checkIfMedalClipCDN(checkSrc)) {
               await browser.close();
