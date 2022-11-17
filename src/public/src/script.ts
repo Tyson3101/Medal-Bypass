@@ -47,8 +47,10 @@ async function downloadVideo(initialURL?: string) {
   button.style.cursor = "not-allowed";
   button.innerText = "Wait " + cooldown + " seconds!";
   lastURLs.push({ url, active: true }); // History of clips
+  const containerElement = document.createElement("div");
   const videoElement = document.createElement("video");
   const aElement = document.createElement("a");
+  containerElement.classList.add("video");
   aElement.target = "_blank";
   aElement.download = "MedalDownload";
   aElement.innerText = "Download Here";
@@ -83,8 +85,9 @@ async function downloadVideo(initialURL?: string) {
     aElement.href = video.src;
     videoElement.src = video.src;
     videoElement.controls = true;
-    videosContainer.prepend(videoElement);
-    videosContainer.prepend(aElement);
+    containerElement.prepend(videoElement);
+    containerElement.prepend(aElement);
+    videosContainer.prepend(containerElement);
   } catch {
     // FOR ERRORS!
     lastURLs.splice(
