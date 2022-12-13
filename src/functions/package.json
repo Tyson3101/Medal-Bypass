@@ -1,6 +1,6 @@
 {
-  "name": "functions",
-  "description": "Cloud Functions for Firebase",
+  "name": "medalbypass",
+  "description": "Bypasses Medal Watermark",
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -14,18 +14,18 @@
   "main": "./dist/index.js",
   "type": "module",
   "dependencies": {
-    "chrome-aws-lambda": "^9.1.0",
+    "chrome-aws-lambda": "latest",
     "cors": "latest",
-    "dotenv": "^16.0.3",
-    "firebase-admin": "^11.2.0",
-    "firebase-functions": "^4.0.1",
+    "dotenv": "latest",
+    "firebase-admin": "latest",
+    "firebase-functions": "latest",
     "m3u8-to-mp4": "latest",
     "puppeteer-extra": "latest",
     "puppeteer-extra-plugin-stealth": "latest",
     "request-promise-native": "latest"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.2.0"
+    "firebase-functions-test": "latest"
   },
   "private": true
 }
