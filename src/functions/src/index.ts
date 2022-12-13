@@ -20,6 +20,7 @@ const converter = new m3u8ToMp4();
 const stealth = StealthPlugin();
 puppeteer.use(stealth);
 
+// Loads Service Account Key
 const loadJSON = (path: string) =>
   JSON.parse(readFileSync(new URL(path, import.meta.url)).toString());
 
@@ -39,7 +40,7 @@ bucket
   })
   .catch(console.error);
 
-function getFileURL(url: string, browser: Browser) {
+function getFileURL(url: string, browser: Browser): Promise<string | null> {
   return new Promise(async (resolve) => {
     // Set up page and request interception
     const page = await browser.newPage();
@@ -51,6 +52,9 @@ function getFileURL(url: string, browser: Browser) {
 
     // Listens to network requests
     page.on("request", async (request) => {
+      // Checks if clip is invalid
+      if (page.url().toLowerCase().includes("medal.tv/error"))
+        return resolve(null);
       // Checks if request is m3u8 file (THE MEDAL CLIP FILE)
       if (["master.m3u8", id].every((v) => request.url().includes(v))) {
         // File Name + Location
@@ -93,7 +97,7 @@ function getFileURL(url: string, browser: Browser) {
     try {
       await page.goto(url, { waitUntil: "load" });
       await page.waitForSelector(`[id*='feed-clip-player-${id}'] video`, {
-        timeout: 5000,
+        timeout: 10000,
       });
     } catch {
       return resolve(null);
@@ -107,10 +111,6 @@ function getFileURL(url: string, browser: Browser) {
       const source = await videoElementSource(page);
       if (source.includes("cdn.medal.tv/source/")) resolve(source);
     }
-    // Checks if redirects to invalid clip page
-    page.on("load", () => {
-      if (page.url().includes("/error")) resolve(null);
-    });
   });
 }
 
@@ -126,9 +126,11 @@ const video = functions
     res.set("Access-Control-Allow-Methods", "GET, POST");
     res.set("Access-Control-Allow-Headers", "Content-Type");
     res.set("Access-Control-Max-Age", "3600");
-    let url = req.body.url;
+
+    // Gets the input url
+    let url: string = req.body.url;
     if (req.method === "GET") {
-      url = req.query.url;
+      url = req.query.url as string;
     }
 
     // Checks and helps make vaild url
@@ -137,6 +139,9 @@ const video = functions
       if (!url.includes("/")) url = "https://medal.tv/clips/" + url;
       else return res.json({ valid: false });
     }
+
+    url = url.replace("?theater=true", "");
+
     // Starts browser
     const browser = await puppeteer.launch({
       args: chromium.args,
