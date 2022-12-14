@@ -386,6 +386,7 @@ Wait a couple of seconds and try again.`;
         if (loadingInterval) clearInterval(loadingInterval);
         loading.style.display = "block";
         document.querySelector(".linkHelp").style.display = "none";
+        document.querySelector(".linkIssues").style.display = "none";
         loading.innerText = LOADING_MESSAGE;
         let numOfDots = 0;
         loadingInterval = setInterval(() => {

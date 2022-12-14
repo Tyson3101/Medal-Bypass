@@ -98,6 +98,8 @@ function startLoading() {
   loading.style.display = "block";
   (document.querySelector(".linkHelp") as HTMLAnchorElement).style.display =
     "none";
+  (document.querySelector(".linkIssues") as HTMLAnchorElement).style.display =
+    "none";
   loading.innerText = LOADING_MESSAGE;
   let numOfDots = 0;
   loadingInterval = setInterval(() => {
