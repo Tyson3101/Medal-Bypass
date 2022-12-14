@@ -359,7 +359,7 @@ Wait a couple of seconds and try again.`;
           if (!video?.valid) {
             // Remove url from history
             lastURLs.splice(
-              lastURLs.findIndex((u) => u.url === url),
+              lastURLs.findIndex((u) => u.id === id),
               1
             );
             return alert(ERROR_MESSAGE);
@@ -375,7 +375,7 @@ Wait a couple of seconds and try again.`;
         } catch {
           // FOR ERRORS!
           lastURLs.splice(
-            lastURLs.findIndex((u) => u.url === url),
+            lastURLs.findIndex((u) => u.id === id),
             1
           );
           stopLoading();
