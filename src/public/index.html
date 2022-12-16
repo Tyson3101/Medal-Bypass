@@ -261,7 +261,7 @@
           style="text-decoration: none; display: inline; color: inherit"
           href="https://youtu.be/SEwyQpfAZ54?t=120"
         >
-          How It Works?</a
+          How It Works? (OUTDATED, new vid coming soon)</a
         >
       </span>
     </p>
@@ -293,6 +293,8 @@ OR
 Wait a couple of seconds and try again.`;
 
       const LOADING_MESSAGE = `Bypassing Watermark`;
+
+      const COOLDOWN_START = 3;
 
       let loadingInterval;
       let lastURLs = [];
@@ -328,7 +330,7 @@ Wait a couple of seconds and try again.`;
         if (lastURLs.some((u) => id === u.id))
           return alert("You already download this clip!");
         if (cooldown > 0) return alert("Please wait " + cooldown + " seconds.");
-        cooldown = 6;
+        cooldown = COOLDOWN_START;
         button.disabled = true;
         button.style.cursor = "not-allowed";
         button.innerText = "Wait " + cooldown + " seconds!";
