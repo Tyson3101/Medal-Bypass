@@ -48,7 +48,7 @@ function getFileURL(url: string, browser: Browser): Promise<string | null> {
 const video = functions
   .runWith({
     timeoutSeconds: 150,
-    memory: "4GB", // Just in case
+    memory: "1GB", // Just in case
   })
   .https.onRequest(async (req: Request, res: Response): Promise<any> => {
     // Cors
