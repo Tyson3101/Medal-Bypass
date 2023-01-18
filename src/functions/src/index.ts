@@ -6,8 +6,17 @@ import { Request } from "firebase-functions/lib/common/providers/https";
 import puppeteer, { Page, Browser } from "puppeteer";
 import chromium from "chrome-aws-lambda";
 
-function getFileURL(url: string, browser: Browser): Promise<string | null> {
+function getFileURL(
+  url: string,
+  browser: Browser,
+  fetchHTML = true
+): Promise<string | null> {
   return new Promise(async (resolve) => {
+    // Fetch check, faster.
+    if (fetchHTML) {
+      const htmlFileURL = await fetchMedalHTML(url);
+      if (htmlFileURL) return resolve(htmlFileURL);
+    }
     // Set up page
     const page = await browser.newPage();
 
@@ -41,6 +50,21 @@ function getFileURL(url: string, browser: Browser): Promise<string | null> {
         return resolve(recheckFileURL);
     }
     return resolve(null);
+  });
+}
+
+function fetchMedalHTML(url: string): Promise<string | null> {
+  return new Promise(async (resolve) => {
+    // Fetchs raw html text and gets the video url
+    const res = await fetch(url);
+    const html = await res.text();
+    const fileURL = html
+      .split("og:video:url")[1]
+      .split('content="')[1]
+      .split('"')[0];
+    if (!fileURL) return resolve(null);
+    if (["media", "source"].some((str) => fileURL.toLowerCase().includes(str)))
+      return resolve(fileURL);
   });
 }
 
@@ -80,7 +104,7 @@ const video = functions
       headless: chromium.headless,
     });
     try {
-      const src = await getFileURL(url, browser);
+      const src = await getFileURL(url, browser, req.body.fetchHTML);
       if (src) res.json({ valid: true, src });
       else res.json({ valid: false });
     } catch {
