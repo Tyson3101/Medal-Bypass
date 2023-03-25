@@ -5,6 +5,7 @@ import functions, { Response } from "firebase-functions";
 import { Request } from "firebase-functions/lib/common/providers/https";
 import puppeteer, { Page, Browser } from "puppeteer";
 import chromium from "chrome-aws-lambda";
+import fetch from "cross-fetch";
 
 function getFileURL(
   url: string,
