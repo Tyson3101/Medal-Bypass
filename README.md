@@ -14,6 +14,6 @@
 
 ### How
 
-##### With Puppeteer and Firebase anything is possible.
+##### Fetch . Simple
 
 ###### By Tyson3101

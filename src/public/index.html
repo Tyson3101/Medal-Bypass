@@ -184,8 +184,8 @@
     <div class="inputArea">
       <div class="header">
         <h1 aria-label="Header">Medal Bypass</h1>
-        <span id="desc" aria-label="Description"
-          >Bypasses the requirement of Medal Premium in order to download clips
+        <span id="desc" aria-label="Description">
+          Bypasses the requirement of Medal Premium in order to download clips
           without watermarks!
         </span>
       </div>
@@ -337,7 +337,7 @@ Wait a couple of seconds and try again.`;
         try {
           // Sends URL to server to download clip without watermark
           const fetchData = await fetch(
-            "https://us-central1-medalbypass.cloudfunctions.net/video",
+            "https://us-central1-medalbypass.cloudfunctions.net/medalwatermark",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
