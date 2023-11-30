@@ -441,5 +441,14 @@ Wait a couple of seconds and try again.`;
         }
       }, 1000);
     </script>
+    <script>
+      // Vercel Analytics for Page Views and such
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>
