@@ -31,6 +31,7 @@
       crossorigin="use-credentials"
       href="site.webmanifest"
     />
+    <script defer src="/_vercel/insights/script.js"></script>
     <style>
       :root {
         --text-color: rgb(0, 183, 134);
@@ -440,8 +441,7 @@ Wait a couple of seconds and try again.`;
             button.innerText = "Download Another Clip";
         }
       }, 1000);
-    </script>
-    <script>
+
       // Vercel Analytics for Page Views and such
       window.va =
         window.va ||
@@ -449,6 +449,5 @@ Wait a couple of seconds and try again.`;
           (window.vaq = window.vaq || []).push(arguments);
         };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>
