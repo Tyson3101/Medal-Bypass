@@ -387,6 +387,7 @@ Wait a couple of seconds and try again.`;
           loading.innerText = LOADING_MESSAGE + ".".repeat(numOfDots);
         }, 500);
       }
+
       function stopLoading(successful = true) {
         if (lastURLs.some((u) => u.active)) return;
         if (loadingInterval) clearInterval(loadingInterval);
