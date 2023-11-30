@@ -2,7 +2,7 @@
 
 ### Where
 
-##### Check the website here: [https://medalbypass.web.app](https://medalbypass.web.app)
+##### Check the website here: [https://medalbypass.vercel.app](https://medalbypass.vercel.app)
 
 ### What
 
