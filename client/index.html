@@ -283,10 +283,28 @@
           style="color: rgb(0, 183, 134); font-size: 1.1em"
           href="https://youtube.com/@Tyson3101?sub_confirmation=1"
           target="_blank"
-          >Help me reach 100 Subscribers on Youtube!<br/><span style="font-size: 0.7em"
-          >Click Here</span
-        ></a
+          >Help me reach 100 Subscribers on Youtube!
+        </a>
+        <div
+          style="
+            font-size: 1em;
+            background-color: red;
+            color: white;
+            padding: 0.2em;
+            border-radius: 0.2em;
+            width: 50%;
+            margin: 0 auto;
+            cursor: pointer;
+          "
         >
+          <a
+            href="https://youtube.com/@Tyson3101?sub_confirmation=1"
+            target="_blank"
+            style="text-decoration: none; color: white"
+          >
+            Subscribe
+          </a>
+        </div>
         <span style="font-size: 0.8em"
           >This message will go away once you subscribe, or I reach 100.</span
         >
@@ -298,18 +316,6 @@
       </div>
     </div>
     <script>
-      // Check if subscribed
-      const subscribed = localStorage.getItem("subscribed");
-      if (!subscribed) {
-        const SUBSCRIBE = document.querySelector("#SUBSCRIBE");
-        SUBSCRIBE.style.display = "block";
-        const a = SUBSCRIBE.querySelector("a");
-        a.addEventListener("click", () => {
-          SUBSCRIBE.style.display = "none";
-          localStorage.setItem("subscribed", true);
-        });
-      }
-
       const ERROR_MESSAGE = `Please enter a valid Medal clip URL/ID.
 Make sure you have copied the URL/ID correctly and the clip is not private.
 OR
@@ -396,6 +402,20 @@ Wait a couple of seconds and try again.`;
           containerElement.prepend(aElement);
           videosContainer.prepend(containerElement);
           document.body.dataset["clipsShown"] = "true";
+
+          // Check if subscribed
+          const subscribed = localStorage.getItem("subscribed");
+          if (!subscribed) {
+            const SUBSCRIBE = document.querySelector("#SUBSCRIBE");
+            SUBSCRIBE.style.display = "block";
+            const aTags = SUBSCRIBE.querySelectorAll("a");
+            for (let a of aTags) {
+              a.addEventListener("click", () => {
+                SUBSCRIBE.style.display = "none";
+                localStorage.setItem("subscribed", true);
+              });
+            }
+          }
         } catch {
           // FOR ERRORS!
           lastURLs.splice(
