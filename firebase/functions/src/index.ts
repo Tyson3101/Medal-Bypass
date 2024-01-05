@@ -41,6 +41,10 @@ const medalwatermark = functions
       else return res.json({ valid: false });
     }
 
+    if (!url.toLowerCase().includes("?mobilebypass=true")) {
+      url += "?mobilebypass=true";
+    }
+
     url = url.replace("?theater=true", "");
 
     try {

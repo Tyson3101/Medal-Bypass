@@ -276,6 +276,7 @@
       >
         By Tyson3101
       </a>
+      <br />
     </p>
 
     <div id="videos"></div>
@@ -315,6 +316,10 @@ Wait a couple of seconds and try again.`;
           else return alert("Please enter a valid Medal clip URL/ID.");
         }
 
+        if (!url.toLowerCase().includes("?mobilebypass=true")) {
+          url += "?mobilebypass=true";
+        }
+
         url = url.replace("?theater=true", "");
 
         // Clip ID
@@ -340,7 +345,8 @@ Wait a couple of seconds and try again.`;
         try {
           // Sends URL to server to download clip without watermark
           const fetchData = await fetch(
-            "https://us-central1-medalbypass.cloudfunctions.net/medalwatermark",
+            //"https://us-central1-medalbypass.cloudfunctions.net/medalwatermark",
+            "http://127.0.0.1:5001/medalbypass/us-central1/medalwatermark",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
