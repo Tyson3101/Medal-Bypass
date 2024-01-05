@@ -12,6 +12,7 @@ function getFileURL(url: string): Promise<string | null> {
     const html = await res.text();
     const fileURL = html.split('"contentUrl":"')[1]?.split('","')[0];
     if (fileURL) return resolve(fileURL);
+    else return resolve(null);
   });
 }
 
