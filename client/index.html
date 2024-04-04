@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#553EA8" />
     <meta
       name="keywords"
-      content="Medal,Download,Free,Clips,Fortnite,Rocketleague,Valorant"
+      content="Medal,Download,Free,Watermark,Clips,Fortnite,Rocketleague,Valorant,Roblox"
     />
     <meta name="robots" content="index, follow" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -36,159 +36,17 @@
       :root {
         --text-color: rgb(0, 183, 134);
       }
-
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        color: var(--text-color);
-        background-color: rgb(29, 25, 25);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        height: 95vh;
-        overflow: hidden;
-      }
-      .inputArea {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        padding: 6vw;
-        border: 2px solid black;
-        box-shadow: 0 0 10px 3px rgb(0, 0, 0);
-        max-width: 700px;
-        min-width: fit-content;
-      }
-      .inputArea .header {
-        margin-bottom: 2em;
-      }
-
-      .inputArea .header::after {
-        content: "";
-        position: relative;
-        top: 0.5em;
-        display: block;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 200px;
-        height: 2px;
-        background-color: var(--text-color);
-      }
-      .inputArea input {
-        max-width: 700px;
-        height: 1.5rem;
-      }
-      body[data-clips-shown="true"] .inputArea {
-        max-width: none;
-        padding: 0;
-        border: none;
-        box-shadow: none;
-      }
-      body[data-clips-shown="true"] .inputArea .header {
-        margin-bottom: 0;
-      }
-      body[data-clips-shown="true"] .inputArea .header::after {
-        display: none;
-      }
-      body[data-clips-shown="true"] .inputArea input {
-        max-width: none;
-      }
-      body[data-clips-shown="true"] {
-        height: auto;
-        overflow: auto;
-      }
-
-      a {
-        display: block;
-        padding: 0.5rem 0;
-        color: rgb(179, 179, 238);
-      }
-      a:hover {
-        color: rgb(120, 120, 205);
-      }
-      button {
-        margin-top: 1em;
-        display: block;
-        padding: 1rem;
-        margin-bottom: 1em;
-        cursor: pointer;
-      }
-
-      #desc {
-        font-size: 0.9em;
-        font-weight: normal;
-        display: block;
-        margin-bottom: 1.4em;
-      }
-      h1 {
-        margin-top: 0;
-        margin-bottom: 0;
-        font-size: 3rem;
-      }
-      #videos {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-      }
-
-      .video {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1rem 1rem;
-        box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
-        margin-bottom: 1rem;
-        width: 100%;
-        max-width: 700px;
-      }
-      .video a {
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: larger;
-      }
-      .video video {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
-        margin-bottom: 1em;
-      }
-
-      .linkHelp,
-      .linkIssues {
-        color: inherit;
-        /* add color transiton */
-        transition: color 0.2s;
-      }
-      .linkIssues:hover,
-      .linkHelp:hover {
-        transition: color 0.2s;
-        color: rgb(0, 183, 160);
-      }
-      .linkIssues {
-        display: none;
-        font-size: 1.5em;
-        text-decoration: none;
-      }
-
-      body[data-clips-shown="true"] .linkHelp {
-        display: none;
-      }
-      body[data-clips-shown="true"] .linkIssues {
-        display: none;
-      }
     </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body data-clips-shown="false">
     <div class="inputArea">
       <div class="header">
         <h1 aria-label="Header">Medal Bypass</h1>
-        <span id="desc" aria-label="Description">
-          Bypasses the requirement of Medal Premium in order to download clips
-          without watermarks!
-        </span>
+        <span id="desc" aria-label="Description"
+          >Bypasses the requirement of Medal Premium in order to download clips
+          without watermarks!</span
+        >
       </div>
       <input
         type="text"
@@ -213,17 +71,18 @@
         aria-label="Loading"
       ></p>
     </div>
+
+    <!-- Bottom left section -->
     <p
       style="
         display: flex;
         justify-content: end;
         align-items: flex-end;
-        gap: 0.5em;
         position: fixed;
         bottom: 0;
         left: 0;
-        text-align: left;
         font-size: 0.75em;
+        gap: 0.5em;
         font-weight: bold;
         margin-left: 1em;
       "
@@ -234,10 +93,11 @@
         style="text-decoration: none; display: inline; color: inherit"
         href="https://github.com/Tyson3101/Medal-Bypass"
       >
-        <i style="font-size: 3rem" class="fa fa-github"></i
-      ></a>
+        <i style="font-size: 3rem" class="fa fa-github"></i>
+      </a>
       <i
         style="
+          display: inline-block;
           transform: scaleY(3.8);
           position: relative;
           top: -1.5rem;
@@ -245,75 +105,118 @@
         "
         >|</i
       >
-
-      <span style="top: -6px; position: relative">
+      <span style="position: relative; top: -6px">
         <a
           aria-label="How it works"
           target="_blank"
           style="text-decoration: none; display: inline; color: inherit"
           href="https://youtu.be/chbzCxr5FpM"
         >
-          How It Works?</a
-        >
+          How It Works?
+        </a>
       </span>
     </p>
+
+    <!-- Bottom right section -->
     <p
       style="
         position: fixed;
         bottom: 0;
         right: 0;
-        text-align: left;
         font-size: 0.75em;
         font-weight: bold;
         margin-right: 1em;
+        text-align: right;
       "
     >
+      <span style="font-size: smaller">Check out my other work:</span><br />
       <a
-        aria-label="Author Page"
+        href="https://chrome.google.com/webstore/detail/ckbnikemebopgknkpgjlkbffpkkhblbe"
         target="_blank"
-        style="text-decoration: none; display: inline; color: inherit"
-        href="https://www.youtube.com/channel/UCDhbvtFFtYvv9kH-kcdVsWg"
+        style="
+          text-decoration: none;
+          display: inline-block;
+          padding: 0;
+          margin: 0;
+          color: rgb(0, 183, 165);
+        "
+        >Auto YT Shorts Scroller</a
+      ><br />
+      <a
+        href="https://chrome.google.com/webstore/detail/egmgebeelgaakhaoodlmnimbfemfgdah"
+        target="_blank"
+        style="
+          text-decoration: none;
+          display: inline-block;
+          padding: 0;
+          margin: 0;
+          color: rgb(0, 183, 165);
+        "
+        >Redirect Blocker</a
+      ><br />
+      <a
+        href="https://tyson3101.com"
+        target="_blank"
+        style="
+          text-decoration: overline;
+          display: inline-block;
+          padding: 0;
+          margin-top: 2px;
+          color: rgb(0, 183, 165);
+          font-size: 0.9em;
+        "
+        >Tyson3101.com</a
       >
-        By Tyson3101
-      </a>
-      <br />
     </p>
 
     <div id="videos"></div>
 
     <script>
+      // Constants
       const ERROR_MESSAGE = `Please enter a valid Medal clip URL/ID.
 Make sure you have copied the URL/ID correctly and the clip is not private.
 OR
 Wait a couple of seconds and try again.`;
-
       const LOADING_MESSAGE = `Bypassing Watermark`;
-
       const COOLDOWN_START = 3;
 
+      // Variables
       let loadingInterval;
       let lastURLs = [];
       let cooldown = 0;
+
+      // DOM Elements
       const videosContainer = document.querySelector("#videos");
       const loading = document.querySelector("p");
       const button = document.querySelector("button");
+
+      // Event Listener for button click
       button.addEventListener("click", () => downloadVideo());
+
+      // Check if URL is provided in params
       const params = new URLSearchParams(document.location.search);
       if (params.get("url")?.length) {
         downloadVideo(params.get("url"));
       }
+
+      // Function to download video
       async function downloadVideo(initialURL) {
         let url = document.querySelector("input").value;
-        // Checks URL Parmam if no URL is entered
+
+        // Checks URL Param if no URL is entered
         if (initialURL?.length && !url.length) {
           url = initialURL;
         }
 
-        // Checks if vaild url
-        if (!url) return alert("Please enter a valid Medal clip URL/ID.");
-        if (!url.includes("medal")) {
-          if (!url.includes("/")) url = "https://medal.tv/clips/" + url;
-          else return alert("Please enter a valid Medal clip URL/ID.");
+        // Checks if valid URL
+        if (!url) return showError("Please enter a valid Medal clip URL/ID.");
+        if (!url.toLowerCase().includes("medal")) {
+          if (!url.includes("/") && !url.includes(" "))
+            url = "https://medal.tv/clips/" + url;
+          else return showError("Please enter a valid Medal clip URL/ID.");
+        }
+        if (!url.toLowerCase().includes("https://")) {
+          url = "https://" + url;
         }
 
         if (!url.toLowerCase().includes("?mobilebypass=true")) {
@@ -325,16 +228,20 @@ Wait a couple of seconds and try again.`;
         // Clip ID
         const id = url.split("/clips/")[1].split("/")[0];
 
-        // Check if downloading or is already downlowaed
+        // Check if downloading or already downloaded
         if (lastURLs.some((u) => id === u.id))
-          return alert("You already download this clip!");
+          return alert("You already downloaded this clip!");
         if (cooldown > 0) return alert("Please wait " + cooldown + " seconds.");
+
         cooldown = COOLDOWN_START;
         button.disabled = true;
         button.style.cursor = "not-allowed";
         button.innerText = "Wait " + cooldown + " seconds!";
+
         lastURLs.push({ id, active: true }); // History of clips
         startLoading();
+
+        // Creating elements
         const containerElement = document.createElement("div");
         const videoElement = document.createElement("video");
         const aElement = document.createElement("a");
@@ -342,8 +249,9 @@ Wait a couple of seconds and try again.`;
         aElement.download = "MedalTV_" + id + ".mp4";
         aElement.innerText = "Download Here";
         const data = { url };
+
         try {
-          // Sends URL to server to download clip without watermark
+          // Sending URL to server to download clip without watermark
           const fetchData = await fetch(
             "https://us-central1-medalbypass.cloudfunctions.net/medalwatermark",
             {
@@ -351,10 +259,13 @@ Wait a couple of seconds and try again.`;
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(data),
             }
-          ).catch((e) => e);
+          ).catch((e) => showError(ERROR_MESSAGE, true));
           const video = await fetchData?.json(); // Returns download link
-          lastURLs[lastURLs.findIndex((u) => u.id === id)].active = false; // Edits history to link toggle link to done
-          // Checks if vaild
+
+          // Edit history to link toggle link to done
+          lastURLs[lastURLs.findIndex((u) => u.id === id)].active = false;
+
+          // Check if valid
           stopLoading(!!video?.valid);
           if (!video?.valid) {
             // Remove url from history
@@ -362,9 +273,10 @@ Wait a couple of seconds and try again.`;
               lastURLs.findIndex((u) => u.id === id),
               1
             );
-            return alert(ERROR_MESSAGE);
+            return showError(ERROR_MESSAGE, true);
           }
-          // Adds download btn and video to screen
+
+          // Add download btn and video to screen
           aElement.href = video.src;
           videoElement.src = video.src;
           videoElement.controls = true;
@@ -373,15 +285,17 @@ Wait a couple of seconds and try again.`;
           videosContainer.prepend(containerElement);
           document.body.dataset["clipsShown"] = "true";
         } catch {
-          // FOR ERRORS!
+          // For errors
           lastURLs.splice(
             lastURLs.findIndex((u) => u.id === id),
             1
           );
           stopLoading();
-          return alert(ERROR_MESSAGE);
+          return showError(ERROR_MESSAGE, true);
         }
       }
+
+      // Function to start loading animation
       function startLoading() {
         if (loadingInterval) clearInterval(loadingInterval);
         loading.style.display = "block";
@@ -396,6 +310,7 @@ Wait a couple of seconds and try again.`;
         }, 500);
       }
 
+      // Function to stop loading animation
       function stopLoading(successful = true) {
         if (lastURLs.some((u) => u.active)) return;
         if (loadingInterval) clearInterval(loadingInterval);
@@ -405,7 +320,17 @@ Wait a couple of seconds and try again.`;
           document.querySelector(".linkIssues").style.display = "block";
         }
       }
-      // Cooldown
+
+      // Function to show/alert error
+      function showError(errMsg, showGHIssue = false) {
+        alert(errMsg);
+        document.querySelector(".linkHelp").style.display = "block";
+        if (showGHIssue) {
+          document.querySelector(".linkIssues").style.display = "block";
+        }
+      }
+
+      // Cooldown timer
       setInterval(() => {
         if (cooldown > 0) {
           button.disabled = true;
