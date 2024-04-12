@@ -13,15 +13,29 @@
     <meta name="theme-color" content="#553EA8" />
     <meta
       name="keywords"
-      content="Medal,Download,Free,Clips,Fortnite,Rocketleague,Valorant"
+      content="Medal,Download,Free,Watermark,Clips,Fortnite,Rocketleague,Valorant,Roblox"
     />
     <meta name="robots" content="index, follow" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="language" content="English" />
     <meta name="author" content="Tyson3101" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="public/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="public/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="public/favicon-16x16.png"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -36,159 +50,17 @@
       :root {
         --text-color: rgb(0, 183, 134);
       }
-
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        color: var(--text-color);
-        background-color: rgb(29, 25, 25);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        height: 95vh;
-        overflow: hidden;
-      }
-      .inputArea {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        padding: 6vw;
-        border: 2px solid black;
-        box-shadow: 0 0 10px 3px rgb(0, 0, 0);
-        max-width: 700px;
-        min-width: fit-content;
-      }
-      .inputArea .header {
-        margin-bottom: 2em;
-      }
-
-      .inputArea .header::after {
-        content: "";
-        position: relative;
-        top: 0.5em;
-        display: block;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 200px;
-        height: 2px;
-        background-color: var(--text-color);
-      }
-      .inputArea input {
-        max-width: 700px;
-        height: 1.5rem;
-      }
-      body[data-clips-shown="true"] .inputArea {
-        max-width: none;
-        padding: 0;
-        border: none;
-        box-shadow: none;
-      }
-      body[data-clips-shown="true"] .inputArea .header {
-        margin-bottom: 0;
-      }
-      body[data-clips-shown="true"] .inputArea .header::after {
-        display: none;
-      }
-      body[data-clips-shown="true"] .inputArea input {
-        max-width: none;
-      }
-      body[data-clips-shown="true"] {
-        height: auto;
-        overflow: auto;
-      }
-
-      a {
-        display: block;
-        padding: 0.5rem 0;
-        color: rgb(179, 179, 238);
-      }
-      a:hover {
-        color: rgb(120, 120, 205);
-      }
-      button {
-        margin-top: 1em;
-        display: block;
-        padding: 1rem;
-        margin-bottom: 1em;
-        cursor: pointer;
-      }
-
-      #desc {
-        font-size: 0.9em;
-        font-weight: normal;
-        display: block;
-        margin-bottom: 1.4em;
-      }
-      h1 {
-        margin-top: 0;
-        margin-bottom: 0;
-        font-size: 3rem;
-      }
-      #videos {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-      }
-
-      .video {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1rem 1rem;
-        box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
-        margin-bottom: 1rem;
-        width: 100%;
-        max-width: 700px;
-      }
-      .video a {
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: larger;
-      }
-      .video video {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
-        margin-bottom: 1em;
-      }
-
-      .linkHelp,
-      .linkIssues {
-        color: inherit;
-        /* add color transiton */
-        transition: color 0.2s;
-      }
-      .linkIssues:hover,
-      .linkHelp:hover {
-        transition: color 0.2s;
-        color: rgb(0, 183, 160);
-      }
-      .linkIssues {
-        display: none;
-        font-size: 1.5em;
-        text-decoration: none;
-      }
-
-      body[data-clips-shown="true"] .linkHelp {
-        display: none;
-      }
-      body[data-clips-shown="true"] .linkIssues {
-        display: none;
-      }
     </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body data-clips-shown="false">
     <div class="inputArea">
       <div class="header">
         <h1 aria-label="Header">Medal Bypass</h1>
-        <span id="desc" aria-label="Description">
-          Bypasses the requirement of Medal Premium in order to download clips
-          without watermarks!
-        </span>
+        <span id="desc" aria-label="Description"
+          >Bypasses the requirement of Medal Premium in order to download clips
+          without watermarks!</span
+        >
       </div>
       <input
         type="text"
@@ -213,17 +85,18 @@
         aria-label="Loading"
       ></p>
     </div>
+
+    <!-- Bottom left section -->
     <p
       style="
         display: flex;
         justify-content: end;
         align-items: flex-end;
-        gap: 0.5em;
         position: fixed;
         bottom: 0;
         left: 0;
-        text-align: left;
         font-size: 0.75em;
+        gap: 0.5em;
         font-weight: bold;
         margin-left: 1em;
       "
@@ -234,10 +107,11 @@
         style="text-decoration: none; display: inline; color: inherit"
         href="https://github.com/Tyson3101/Medal-Bypass"
       >
-        <i style="font-size: 3rem" class="fa fa-github"></i
-      ></a>
+        <i style="font-size: 3rem" class="fa fa-github"></i>
+      </a>
       <i
         style="
+          display: inline-block;
           transform: scaleY(3.8);
           position: relative;
           top: -1.5rem;
@@ -245,38 +119,68 @@
         "
         >|</i
       >
-
-      <span style="top: -6px; position: relative">
+      <span style="position: relative; top: -6px">
         <a
           aria-label="How it works"
           target="_blank"
           style="text-decoration: none; display: inline; color: inherit"
           href="https://youtu.be/chbzCxr5FpM"
         >
-          How It Works?</a
-        >
+          How It Works?
+        </a>
       </span>
     </p>
+
+    <!-- Bottom right section -->
     <p
       style="
         position: fixed;
         bottom: 0;
         right: 0;
-        text-align: left;
         font-size: 0.75em;
         font-weight: bold;
         margin-right: 1em;
+        text-align: right;
       "
     >
+      <span style="font-size: smaller">Check out my other work:</span><br />
       <a
-        aria-label="Author Page"
+        href="https://chrome.google.com/webstore/detail/ckbnikemebopgknkpgjlkbffpkkhblbe"
         target="_blank"
-        style="text-decoration: none; display: inline; color: inherit"
-        href="https://www.youtube.com/channel/UCDhbvtFFtYvv9kH-kcdVsWg"
+        style="
+          text-decoration: none;
+          display: inline-block;
+          padding: 0;
+          margin: 0;
+          color: rgb(0, 183, 165);
+        "
+        >Auto YT Shorts Scroller</a
+      ><br />
+      <a
+        href="https://chrome.google.com/webstore/detail/egmgebeelgaakhaoodlmnimbfemfgdah"
+        target="_blank"
+        style="
+          text-decoration: none;
+          display: inline-block;
+          padding: 0;
+          margin: 0;
+          color: rgb(0, 183, 165);
+        "
+        >Redirect Blocker</a
+      ><br />
+      <a
+        href="https://tyson3101.com"
+        target="_blank"
+        style="
+          text-decoration: overline;
+          display: inline-block;
+          padding: 0;
+          margin-top: 2px;
+          color: rgb(0, 183, 165);
+          font-size: 0.9em;
+        "
+        >Tyson3101.com</a
       >
-        By Tyson3101
-      </a>
-      <br />
     </p>
 
     <div id="videos"></div>
