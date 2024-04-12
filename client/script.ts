@@ -51,15 +51,12 @@ async function downloadVideo(initialURL?: string) {
   try {
     const video = await fetchVideoWithoutWatermark(url);
     if (!video?.valid) {
-      removeClipFromHistory(id);
       stopLoading(false);
       return alert(ERROR_MESSAGE);
     }
-    updateClipFromHistory(id);
     stopLoading(video?.valid);
     displayVideoWithDownloadLink(video.src, id);
   } catch {
-    removeClipFromHistory(id);
     stopLoading();
     return alert(ERROR_MESSAGE);
   }
@@ -163,10 +160,12 @@ function startLoading() {
   }, 500);
 }
 
-function stopLoading(successful = true) {
-  console.log("Stop loading inside 1");
+function stopLoading(successful = true, id = "") {
+  if (id) {
+    if (successful) updateClipFromHistory(id);
+    else removeClipFromHistory(id);
+  }
   if (lastURLs.some((u) => u.active)) return;
-  console.log("Stop loading inside 2");
   if (loadingInterval) clearInterval(loadingInterval);
   loading.style.display = "none";
   if (!successful) {
