@@ -56,7 +56,7 @@ async function downloadVideo(initialURL?: string) {
       return alert(ERROR_MESSAGE);
     }
     updateClipFromHistory(id);
-    stopLoading(video?.valid);
+    stopLoading(video?.valid, id);
     displayVideoWithDownloadLink(video.src, id);
   } catch {
     removeClipFromHistory(id);
@@ -163,10 +163,10 @@ function startLoading() {
   }, 500);
 }
 
-function stopLoading(successful = true) {
-  console.log("Stop loading inside 1");
+function stopLoading(successful = true, id: string = "") {
+  if (id) updateClipFromHistory(id);
   if (lastURLs.some((u) => u.active)) return;
-  console.log("Stop loading inside 2");
+
   if (loadingInterval) clearInterval(loadingInterval);
   loading.style.display = "none";
   if (!successful) {
