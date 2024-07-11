@@ -16,4 +16,21 @@
 
 ##### Fetch . Simple
 
+-----
+
+## API - Get through a POST / GET Request
+
+### GET:
+
+`https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?url="Encoded url of Medal Clip"`
+
+### POST
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"url":"<your-url>"}' \
+  https://us-central1-medalbypass.cloudfunctions.net/medalwatermark
+```
+
 ###### By Tyson3101
