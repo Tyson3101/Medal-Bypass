@@ -1,60 +1,115 @@
-// IMPORTS
-import dotenv from "dotenv";
-dotenv.config();
-import functions, { Response } from "firebase-functions";
-import { Request } from "firebase-functions/lib/common/providers/https";
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * import {onCall} from "firebase-functions/v2/https";
+ * import {onDocumentWritten} from "firebase-functions/v2/firestore";
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
+import { onRequest } from "firebase-functions/v2/https";
+//import * as logger from "firebase-functions/logger";
+
+import { Response } from "express-serve-static-core";
+import { Request } from "express-serve-static-core";
 import fetch from "cross-fetch";
 
-function getFileURL(url: string): Promise<string | null> {
+function getVideoURL(url: string): Promise<string | null> {
   return new Promise(async (resolve) => {
     // Fetches the html and finds the contentUrl (from the hydrationData), then returns the url if it exists
-    const res = await fetch(url);
-    const html = await res.text();
-    const fileURL = html.split('"contentUrl":"')[1]?.split('","')[0];
-    if (fileURL) return resolve(fileURL);
-    else return resolve(null);
+
+    let html: string;
+    try {
+      const res = await fetch(url);
+      html = await res.text();
+    } catch {
+      return resolve(null);
+    }
+
+    const videoContentURL = html?.split('"contentUrl":"')[1]?.split('","')[0];
+    if (videoContentURL) return resolve(videoContentURL);
+
+    // -
+    // If the contentUrl can't be found, check the meta video tag (FOR EMBEDS, etc)
+    const videoMetaUrl = html
+      ?.split('property="og:video:url" content="')[1]
+      ?.split('"')[0];
+
+    if (videoMetaUrl) return resolve(videoMetaUrl);
+
+    return resolve(null);
   });
 }
 
+/* 
+https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?url=<Url of Medal Clip>
+https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?id=<ID of Medal Clip>
+*/
 // HTTP endpoint /medalwatermark
-const medalwatermark = functions
-  .runWith({
-    timeoutSeconds: 30,
-    memory: "2GB", // Just in case
-  })
-  .https.onRequest(async (req: Request, res: Response): Promise<any> => {
+const medalwatermark = onRequest(
+  async (req: Request, res: Response): Promise<any> => {
     // Cors
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST");
     res.set("Access-Control-Allow-Headers", "Content-Type");
     res.set("Access-Control-Max-Age", "3600");
 
-    // Gets the input url
-    let url: string = req.body.url;
-    if (req.method === "GET") {
-      url = req.query.url as string;
-    }
+    // Helper function to get input URL
+    const getInputUrl = (): string => {
+      if (req.method === "GET") {
+        return (req.query.url as string) || (req.query.id as string) || "";
+      } else {
+        return (req.body.url as string) || (req.body.id as string) || "";
+      }
+    };
 
-    // Checks and helps make vaild url
-    if (!url) return res.json({ valid: false });
-    if (!url.includes("medal")) {
-      if (!url.includes("/")) url = "https://medal.tv/clips/" + url;
-      else return res.json({ valid: false });
-    }
+    // Get the input URL
+    const inputtedUrl: string = getInputUrl();
 
-    if (!url.toLowerCase().includes("?mobilebypass=true")) {
-      url += "?mobilebypass=true";
-    }
-
-    url = url.replace("?theater=true", "");
+    const url = configureURL(inputtedUrl);
+    if (!url || !checkURL(url))
+      return res.json({ valid: false, reasoning: "Invalid URL" });
 
     try {
-      const src = await getFileURL(url);
+      const src = await getVideoURL(url);
       if (src) res.json({ valid: true, src });
-      else res.json({ valid: false });
+      else res.json({ valid: false, reasoning: "No clip found" });
     } catch {
-      res.json({ valid: false });
+      res.json({ valid: false, reasoning: "Error fetching clip" });
     }
-  });
+  }
+);
+
+function configureURL(url: string): string | false {
+  if (!url) return false;
+  if (!url.toLowerCase().includes("medal")) {
+    if (!url.includes("/")) url = "https://medal.tv/?contentId=" + url.trim();
+    else return false;
+  }
+  if (
+    url.toLowerCase().indexOf("https://") !==
+    url.toLowerCase().lastIndexOf("https://")
+  ) {
+    return false;
+  }
+  if (!url.toLowerCase().includes("https://")) {
+    url = "https://" + url;
+  }
+
+  url = url.replace("?theater=true", "");
+  return url;
+}
+
+function checkURL(url: string): boolean {
+  try {
+    if (!url) return false;
+    if (!new URL(url).hostname.toLowerCase().includes("medal")) {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+  return true;
+}
 
 export { medalwatermark };

@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021", "DOM", "DOM.Iterable"],
-    "module": "ES2020",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "target": "ES2021",
-    "outDir": "dist",
-    "typeRoots": ["node_modules/@types"],
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017"
   },
-  "include": ["src"]
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
 }
