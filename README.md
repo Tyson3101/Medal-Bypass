@@ -16,21 +16,34 @@
 
 ##### Fetch . Simple
 
------
+---
 
-## API - Get through a POST / GET Request
+## API - Get through a GET / POST Request
 
 ### GET:
 
-`https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?url="Encoded url of Medal Clip"`
+`https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?url=<Url of Medal Clip>`
+`https://us-central1-medalbypass.cloudfunctions.net/medalwatermark?id=<ID of Medal Clip>`
 
 ### POST
 
 ```
 curl -X POST \
   -H "Content-Type: application/json" \
-  -d '{"url":"<your-url>"}' \
+  -d '{"url":"<your-clip-url>"}' \
   https://us-central1-medalbypass.cloudfunctions.net/medalwatermark
+```
+
+##### `'{"url":"<your-url>"}'` can be replaced with `'{"id":"<your-clip-id>"}'`
+
+### RESPONSE (JSON)
+
+```json
+{
+  "valid": "true" | "false",
+  "src": "<MEDAL CLIP MP4 URL>"   *IF VALID
+  "reasoning": "<REASON FOR ERROR>"   *IF INVALID
+}
 ```
 
 ###### By Tyson3101
