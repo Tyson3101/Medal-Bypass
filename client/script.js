@@ -18,9 +18,10 @@ if (params.get("url")?.length) {
   downloadVideo(params.get("url"));
 }
 async function downloadVideo(initialURL) {
-  let checkURL = initialURL ?? document.querySelector("input").value;
-  let url = configureURL(checkURL);
-  if (!url) return alert("Please enter a valid Medal clip URL/ID.");
+  let inputtedURL = initialURL ?? document.querySelector("input").value;
+  let url = configureURL(inputtedURL);
+  if (!url || !checkURL(url))
+    return alert("Please enter a valid Medal clip URL/ID.");
   const id = extractClipID(url);
   if (!id) return alert("Please enter a valid Medal clip URL/ID.");
   if (isClipAlreadyDownloaded(id)) {
@@ -36,15 +37,12 @@ async function downloadVideo(initialURL) {
   try {
     const video = await fetchVideoWithoutWatermark(url);
     if (!video?.valid) {
-      removeClipFromHistory(id);
       stopLoading(false);
       return alert(ERROR_MESSAGE);
     }
-    updateClipFromHistory(id);
     stopLoading(video?.valid);
     displayVideoWithDownloadLink(video.src, id);
   } catch {
-    removeClipFromHistory(id);
     stopLoading();
     return alert(ERROR_MESSAGE);
   }
@@ -64,18 +62,31 @@ async function fetchVideoWithoutWatermark(url) {
 function configureURL(url) {
   if (!url) return false;
   if (!url.toLowerCase().includes("medal")) {
-    if (!url.includes("/") && !url.includes(" "))
-      url = "https://medal.tv/clips/" + url;
+    if (!url.includes("/")) url = "https://medal.tv/?contentId=" + url.trim();
     else return false;
+  }
+  if (
+    url.toLowerCase().indexOf("https://") !==
+    url.toLowerCase().lastIndexOf("https://")
+  ) {
+    return false;
   }
   if (!url.toLowerCase().includes("https://")) {
     url = "https://" + url;
   }
-  if (!url.toLowerCase().includes("?mobilebypass=true")) {
-    url += "?mobilebypass=true";
-  }
   url = url.replace("?theater=true", "");
   return url;
+}
+function checkURL(url) {
+  try {
+    if (!url) return false;
+    if (!new URL(url).hostname.toLowerCase().includes("medal")) {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+  return true;
 }
 function displayVideoWithDownloadLink(src, id) {
   const containerElement = document.createElement("div");
@@ -94,8 +105,11 @@ function displayVideoWithDownloadLink(src, id) {
 }
 function extractClipID(url) {
   if (url.includes("/clips/")) return url.split("/clips/")[1].split("/")[0];
-  if (!url.includes(" ")) return url;
-  else return "false";
+  else if (url.includes("?contentId="))
+    return url.split("?contentId=")[1].split
+      ? url.split("?contentId=")[1].split("&")[0]
+      : url.split("?contentId=")[1];
+  else return false;
 }
 function isClipAlreadyDownloaded(id) {
   return lastURLs.some((u) => id === u.id);
@@ -133,12 +147,14 @@ function startLoading() {
     loading.innerText = LOADING_MESSAGE + ".".repeat(numOfDots);
   }, 500);
 }
-function stopLoading(successful = true) {
-  console.log("Stop loading inside 1");
-  if (lastURLs.some((u) => u.active)) return;
-  console.log("Stop loading inside 2");
-  if (loadingInterval) clearInterval(loadingInterval);
+function stopLoading(successful = true, id = "") {
   loading.style.display = "none";
+  if (id) {
+    if (successful) updateClipFromHistory(id);
+    else removeClipFromHistory(id);
+  }
+  if (lastURLs.some((u) => u.active)) return;
+  if (loadingInterval) clearInterval(loadingInterval);
   if (!successful) {
     linkHelp.style.display = "block";
     linkIssues.style.display = "block";

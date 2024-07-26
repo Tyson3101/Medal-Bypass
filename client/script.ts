@@ -26,10 +26,11 @@ if (params.get("url")?.length) {
 }
 
 async function downloadVideo(initialURL?: string) {
-  let checkURL = initialURL ?? document.querySelector("input").value;
+  let inputtedURL = initialURL ?? document.querySelector("input").value;
 
-  let url = configureURL(checkURL);
-  if (!url) return alert("Please enter a valid Medal clip URL/ID.");
+  let url = configureURL(inputtedURL);
+  if (!url || !checkURL(url))
+    return alert("Please enter a valid Medal clip URL/ID.");
 
   const id = extractClipID(url);
   if (!id) return alert("Please enter a valid Medal clip URL/ID.");
@@ -80,20 +81,33 @@ async function fetchVideoWithoutWatermark(
 function configureURL(url: string): string | false {
   if (!url) return false;
   if (!url.toLowerCase().includes("medal")) {
-    if (!url.includes("/") && !url.includes(" "))
-      url = "https://medal.tv/clips/" + url;
+    if (!url.includes("/")) url = "https://medal.tv/?contentId=" + url.trim();
     else return false;
+  }
+  if (
+    url.toLowerCase().indexOf("https://") !==
+    url.toLowerCase().lastIndexOf("https://")
+  ) {
+    return false;
   }
   if (!url.toLowerCase().includes("https://")) {
     url = "https://" + url;
   }
-  if (!url.toLowerCase().includes("?mobilebypass=true")) {
-    url += "?mobilebypass=true";
-  }
 
   url = url.replace("?theater=true", "");
-
   return url;
+}
+
+function checkURL(url: string): boolean {
+  try {
+    if (!url) return false;
+    if (!new URL(url).hostname.toLowerCase().includes("medal")) {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+  return true;
 }
 
 function displayVideoWithDownloadLink(src: string, id: string): void {
@@ -112,10 +126,13 @@ function displayVideoWithDownloadLink(src: string, id: string): void {
   document.body.dataset["clipsShown"] = "true";
 }
 
-function extractClipID(url: string): string {
+function extractClipID(url: string): string | false {
   if (url.includes("/clips/")) return url.split("/clips/")[1].split("/")[0];
-  if (!url.includes(" ")) return url;
-  else return "false";
+  else if (url.includes("?contentId="))
+    return url.split("?contentId=")[1].split
+      ? url.split("?contentId=")[1].split("&")[0]
+      : url.split("?contentId=")[1];
+  else return false;
 }
 
 function isClipAlreadyDownloaded(id: string): boolean {
@@ -161,13 +178,13 @@ function startLoading() {
 }
 
 function stopLoading(successful = true, id = "") {
+  loading.style.display = "none";
   if (id) {
     if (successful) updateClipFromHistory(id);
     else removeClipFromHistory(id);
   }
   if (lastURLs.some((u) => u.active)) return;
   if (loadingInterval) clearInterval(loadingInterval);
-  loading.style.display = "none";
   if (!successful) {
     linkHelp.style.display = "block";
     linkIssues.style.display = "block";
