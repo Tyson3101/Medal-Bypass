@@ -50,8 +50,7 @@ async function downloadVideo(initialURL) {
 async function fetchVideoWithoutWatermark(url) {
   const data = { url };
   const fetchData = await fetch(
-    "http://127.0.0.1:5001/medalbypass/us-central1/medalwatermark",
-    //"https://us-central1-medalbypass.cloudfunctions.net/medalwatermark",
+    "https://medal-bypass-api.glitch.me/watermark",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
