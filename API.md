@@ -11,7 +11,7 @@
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"url":"<your-clip-url>"}' \
-  https://medalbypass.vercel.app
+  https://medalbypass.vercel.app/api/clip
 ```
 
 ##### `'{"url":"<your-url>"}'` can be replaced with `'{"id":"<your-clip-id>"}'`
