@@ -2,38 +2,53 @@ const ERROR_MESSAGE = `Please enter a valid Medal clip URL/ID.
 Make sure you have copied the URL/ID correctly and the clip is not private.
 OR
 Wait a couple of seconds and try again.`;
+
 const LOADING_MESSAGE = `Bypassing Watermark`;
+
 const COOLDOWN_START = 3;
-let loadingInterval = null;
-let lastURLs = [];
+
+let loadingInterval: number | null = null;
+let lastURLs: { id: string; active: boolean }[] = [];
 let cooldown = 0;
+
 const videosContainer = document.querySelector("#videos");
 const loading = document.querySelector("p");
-const linkHelp = document.querySelector(".linkHelp");
-const linkIssues = document.querySelector(".linkIssues");
+
+const linkHelp = document.querySelector(".linkHelp") as HTMLDivElement;
+const linkIssues = document.querySelector(".linkIssues") as HTMLDivElement;
+
 const button = document.querySelector("button");
 button.addEventListener("click", () => downloadVideo());
+
 const params = new URLSearchParams(document.location.search);
 if (params.get("url")?.length) {
   downloadVideo(params.get("url"));
 }
-async function downloadVideo(initialURL) {
+
+async function downloadVideo(initialURL?: string) {
   let inputtedURL = initialURL ?? document.querySelector("input").value;
+
   let url = configureURL(inputtedURL);
   if (!url || !checkURL(url))
     return alert("Please enter a valid Medal clip URL/ID.");
+
   const id = extractClipID(url);
   if (!id) return alert("Please enter a valid Medal clip URL/ID.");
+
   if (isClipAlreadyDownloaded(id)) {
     return alert("You already downloaded this clip!");
   }
+
   if (cooldown > 0) {
     return alert("Please wait " + cooldown + " seconds.");
   }
+
   cooldown = COOLDOWN_START;
   updateButtonState(cooldown);
   addClipToHistory(id);
+
   startLoading();
+
   try {
     const video = await fetchVideoWithoutWatermark(url);
     if (!video?.valid) {
@@ -47,10 +62,13 @@ async function downloadVideo(initialURL) {
     return alert(ERROR_MESSAGE);
   }
 }
-async function fetchVideoWithoutWatermark(url) {
+
+async function fetchVideoWithoutWatermark(
+  url: string
+): Promise<{ src: string; valid: boolean } | undefined> {
   const data = { url };
   const fetchData = await fetch(
-    "https://medal-bypass-api.glitch.me/watermark",
+    "https://medal-bypass-api.vercel.app/api/clip",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -59,7 +77,8 @@ async function fetchVideoWithoutWatermark(url) {
   ).catch((e) => e);
   return fetchData?.json();
 }
-function configureURL(url) {
+
+function configureURL(url: string): string | false {
   if (!url) return false;
   if (!url.toLowerCase().includes("medal")) {
     if (!url.includes("/")) url = "https://medal.tv/?contentId=" + url.trim();
@@ -74,10 +93,12 @@ function configureURL(url) {
   if (!url.toLowerCase().includes("https://")) {
     url = "https://" + url;
   }
+
   url = url.replace("?theater=true", "");
   return url;
 }
-function checkURL(url) {
+
+function checkURL(url: string): boolean {
   try {
     if (!url) return false;
     if (!new URL(url).hostname.toLowerCase().includes("medal")) {
@@ -88,7 +109,8 @@ function checkURL(url) {
   }
   return true;
 }
-function displayVideoWithDownloadLink(src, id) {
+
+function displayVideoWithDownloadLink(src: string, id: string): void {
   const containerElement = document.createElement("div");
   const videoElement = document.createElement("video");
   const aElement = document.createElement("a");
@@ -103,7 +125,8 @@ function displayVideoWithDownloadLink(src, id) {
   videosContainer.prepend(containerElement);
   document.body.dataset["clipsShown"] = "true";
 }
-function extractClipID(url) {
+
+function extractClipID(url: string): string | false {
   if (url.includes("/clips/")) return url.split("/clips/")[1].split("/")[0];
   else if (url.includes("?contentId="))
     return url.split("?contentId=")[1].split
@@ -111,29 +134,35 @@ function extractClipID(url) {
       : url.split("?contentId=")[1];
   else return false;
 }
-function isClipAlreadyDownloaded(id) {
+
+function isClipAlreadyDownloaded(id: string): boolean {
   return lastURLs.some((u) => id === u.id);
 }
-function removeClipFromHistory(id) {
+
+function removeClipFromHistory(id: string): void {
   const index = lastURLs.findIndex((u) => u.id === id);
   if (index !== -1) {
     lastURLs.splice(index, 1);
   }
 }
-function updateClipFromHistory(id) {
+
+function updateClipFromHistory(id: string): void {
   const index = lastURLs.findIndex((u) => u.id === id);
   if (index !== -1) {
     lastURLs[index].active = false;
   }
 }
-function updateButtonState(cooldown) {
+
+function updateButtonState(cooldown: number): void {
   button.disabled = true;
   button.style.cursor = "not-allowed";
   button.innerText = "Wait " + cooldown + " seconds!";
 }
-function addClipToHistory(id) {
+
+function addClipToHistory(id: string): void {
   lastURLs.push({ id, active: true });
 }
+
 function startLoading() {
   if (loadingInterval) clearInterval(loadingInterval);
   loading.style.display = "block";
@@ -147,6 +176,7 @@ function startLoading() {
     loading.innerText = LOADING_MESSAGE + ".".repeat(numOfDots);
   }, 500);
 }
+
 function stopLoading(successful = true, id = "") {
   loading.style.display = "none";
   if (id) {
@@ -160,6 +190,7 @@ function stopLoading(successful = true, id = "") {
     linkIssues.style.display = "block";
   }
 }
+
 // Cooldown
 setInterval(() => {
   if (cooldown > 0) {

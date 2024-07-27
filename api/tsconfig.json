@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // Change target to ES2015 for more conventional JS syntax
+    "module": "ESNext",
+    "moduleResolution": "node", // Resolves modules like Node.js
+    "strict": true, // Enables all strict type-checking options
+    "esModuleInterop": true, // Ensures compatibility with CommonJS modules
+    "skipLibCheck": true, // Skips type checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Enforces consistent casing in filenames
+    "resolveJsonModule": true // Allows importing of JSON files
+  }
+}
