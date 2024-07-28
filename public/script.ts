@@ -23,6 +23,8 @@ button.addEventListener("click", () => downloadVideo());
 const params = new URLSearchParams(document.location.search);
 if (params.get("url")?.length) {
   downloadVideo(params.get("url"));
+} else if (params.get("id")?.length) {
+  downloadVideo(params.get("id"));
 }
 
 async function downloadVideo(initialURL?: string) {
@@ -52,13 +54,13 @@ async function downloadVideo(initialURL?: string) {
   try {
     const video = await fetchVideoWithoutWatermark(url);
     if (!video?.valid) {
-      stopLoading(false);
+      stopLoading(false, id);
       return alert(ERROR_MESSAGE);
     }
-    stopLoading(video?.valid);
+    stopLoading(video?.valid, id);
     displayVideoWithDownloadLink(video.src, id);
   } catch {
-    stopLoading();
+    stopLoading(false, id);
     return alert(ERROR_MESSAGE);
   }
 }
@@ -175,7 +177,6 @@ function startLoading() {
 }
 
 function stopLoading(successful = true, id = "") {
-  loading.style.display = "none";
   if (id) {
     if (successful) updateClipFromHistory(id);
     else removeClipFromHistory(id);
@@ -186,6 +187,7 @@ function stopLoading(successful = true, id = "") {
     linkHelp.style.display = "block";
     linkIssues.style.display = "block";
   }
+  loading.style.display = "none";
 }
 
 // Cooldown
