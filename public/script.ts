@@ -94,7 +94,7 @@ function configureURL(url: string): string | false {
   }
 
   url = url.replace("?theater=true", "");
-  return url;
+  return url.trim();
 }
 
 function checkURL(url: string): boolean {
@@ -126,12 +126,12 @@ function displayVideoWithDownloadLink(src: string, id: string): void {
 }
 
 function extractClipID(url: string): string | false {
-  if (url.includes("/clips/")) return url.split("/clips/")[1].split("/")[0];
-  else if (url.includes("?contentId="))
-    return url.split("?contentId=")[1].split
-      ? url.split("?contentId=")[1].split("&")[0]
-      : url.split("?contentId=")[1];
-  else return false;
+  const clipIdMatch = url.match(/\/clips\/([^\/?&]+)/);
+  const contentIdMatch = url.match(/[?&]contentId=([^&]+)/);
+
+  if (clipIdMatch) return clipIdMatch[1];
+  if (contentIdMatch) return contentIdMatch[1];
+  return false;
 }
 
 function isClipAlreadyDownloaded(id: string): boolean {

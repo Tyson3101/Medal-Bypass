@@ -15,176 +15,160 @@ const button = document.querySelector("button");
 button.addEventListener("click", () => downloadVideo());
 const params = new URLSearchParams(document.location.search);
 if (params.get("url")?.length) {
-    downloadVideo(params.get("url"));
-}
-else if (params.get("id")?.length) {
-    downloadVideo(params.get("id"));
+  downloadVideo(params.get("url"));
+} else if (params.get("id")?.length) {
+  downloadVideo(params.get("id"));
 }
 async function downloadVideo(initialURL) {
-    let inputtedURL = initialURL ?? document.querySelector("input").value;
-    let url = configureURL(inputtedURL);
-    if (!url || !checkURL(url))
-        return alert("Please enter a valid Medal clip URL/ID.");
-    const id = extractClipID(url);
-    if (!id)
-        return alert("Please enter a valid Medal clip URL/ID.");
-    if (isClipAlreadyDownloaded(id)) {
-        return alert("You already downloaded this clip!");
+  let inputtedURL = initialURL ?? document.querySelector("input").value;
+  let url = configureURL(inputtedURL);
+  if (!url || !checkURL(url))
+    return alert("Please enter a valid Medal clip URL/ID.");
+  const id = extractClipID(url);
+  if (!id) return alert("Please enter a valid Medal clip URL/ID.");
+  if (isClipAlreadyDownloaded(id)) {
+    return alert("You already downloaded this clip!");
+  }
+  if (cooldown > 0) {
+    return alert("Please wait " + cooldown + " seconds.");
+  }
+  cooldown = COOLDOWN_START;
+  updateButtonState(cooldown);
+  addClipToHistory(id);
+  startLoading();
+  try {
+    const video = await fetchVideoWithoutWatermark(url);
+    if (!video?.valid) {
+      stopLoading(false, id);
+      return alert(ERROR_MESSAGE);
     }
-    if (cooldown > 0) {
-        return alert("Please wait " + cooldown + " seconds.");
-    }
-    cooldown = COOLDOWN_START;
-    updateButtonState(cooldown);
-    addClipToHistory(id);
-    startLoading();
-    try {
-        const video = await fetchVideoWithoutWatermark(url);
-        if (!video?.valid) {
-            stopLoading(false, id);
-            return alert(ERROR_MESSAGE);
-        }
-        stopLoading(video?.valid, id);
-        displayVideoWithDownloadLink(video.src, id);
-    }
-    catch {
-        stopLoading(false, id);
-        return alert(ERROR_MESSAGE);
-    }
+    stopLoading(video?.valid, id);
+    displayVideoWithDownloadLink(video.src, id);
+  } catch {
+    stopLoading(false, id);
+    return alert(ERROR_MESSAGE);
+  }
 }
 async function fetchVideoWithoutWatermark(url) {
-    const data = { url };
-    const fetchData = await fetch("https://medalbypass.vercel.app/api/clip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    }).catch((e) => e);
-    return fetchData?.json();
+  const data = { url };
+  const fetchData = await fetch("https://medalbypass.vercel.app/api/clip", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).catch((e) => e);
+  return fetchData?.json();
 }
 function configureURL(url) {
-    if (!url)
-        return false;
-    if (!url.toLowerCase().includes("medal")) {
-        if (!url.includes("/"))
-            url = "https://medal.tv/?contentId=" + url.trim();
-        else
-            return false;
-    }
-    if (url.toLowerCase().indexOf("https://") !==
-        url.toLowerCase().lastIndexOf("https://")) {
-        return false;
-    }
-    if (!url.toLowerCase().includes("https://")) {
-        url = "https://" + url;
-    }
-    url = url.replace("?theater=true", "");
-    return url;
+  if (!url) return false;
+  if (!url.toLowerCase().includes("medal")) {
+    if (!url.includes("/")) url = "https://medal.tv/?contentId=" + url.trim();
+    else return false;
+  }
+  if (
+    url.toLowerCase().indexOf("https://") !==
+    url.toLowerCase().lastIndexOf("https://")
+  ) {
+    return false;
+  }
+  if (!url.toLowerCase().includes("https://")) {
+    url = "https://" + url;
+  }
+  url = url.replace("?theater=true", "");
+  return url.trim();
 }
 function checkURL(url) {
-    try {
-        if (!url)
-            return false;
-        if (!new URL(url).hostname.toLowerCase().includes("medal")) {
-            return false;
-        }
+  try {
+    if (!url) return false;
+    if (!new URL(url).hostname.toLowerCase().includes("medal")) {
+      return false;
     }
-    catch {
-        return false;
-    }
-    return true;
+  } catch {
+    return false;
+  }
+  return true;
 }
 function displayVideoWithDownloadLink(src, id) {
-    const containerElement = document.createElement("div");
-    const videoElement = document.createElement("video");
-    const aElement = document.createElement("a");
-    containerElement.classList.add("video");
-    aElement.download = "MedalTV_" + id + ".mp4";
-    aElement.innerText = "Download Here";
-    aElement.href = src;
-    videoElement.src = src;
-    videoElement.controls = true;
-    containerElement.prepend(videoElement);
-    containerElement.prepend(aElement);
-    videosContainer.prepend(containerElement);
-    document.body.dataset["clipsShown"] = "true";
+  const containerElement = document.createElement("div");
+  const videoElement = document.createElement("video");
+  const aElement = document.createElement("a");
+  containerElement.classList.add("video");
+  aElement.download = "MedalTV_" + id + ".mp4";
+  aElement.innerText = "Download Here";
+  aElement.href = src;
+  videoElement.src = src;
+  videoElement.controls = true;
+  containerElement.prepend(videoElement);
+  containerElement.prepend(aElement);
+  videosContainer.prepend(containerElement);
+  document.body.dataset["clipsShown"] = "true";
 }
 function extractClipID(url) {
-    if (url.includes("/clips/"))
-        return url.split("/clips/")[1].split("/")[0];
-    else if (url.includes("?contentId="))
-        return url.split("?contentId=")[1].split
-            ? url.split("?contentId=")[1].split("&")[0]
-            : url.split("?contentId=")[1];
-    else
-        return false;
+  const clipIdMatch = url.match(/\/clips\/([^\/?&]+)/);
+  const contentIdMatch = url.match(/[?&]contentId=([^&]+)/);
+  if (clipIdMatch) return clipIdMatch[1];
+  if (contentIdMatch) return contentIdMatch[1];
+  return false;
 }
 function isClipAlreadyDownloaded(id) {
-    return lastURLs.some((u) => id === u.id);
+  return lastURLs.some((u) => id === u.id);
 }
 function removeClipFromHistory(id) {
-    const index = lastURLs.findIndex((u) => u.id === id);
-    if (index !== -1) {
-        lastURLs.splice(index, 1);
-    }
+  const index = lastURLs.findIndex((u) => u.id === id);
+  if (index !== -1) {
+    lastURLs.splice(index, 1);
+  }
 }
 function updateClipFromHistory(id) {
-    const index = lastURLs.findIndex((u) => u.id === id);
-    if (index !== -1) {
-        lastURLs[index].active = false;
-    }
+  const index = lastURLs.findIndex((u) => u.id === id);
+  if (index !== -1) {
+    lastURLs[index].active = false;
+  }
 }
 function updateButtonState(cooldown) {
-    button.disabled = true;
-    button.style.cursor = "not-allowed";
-    button.innerText = "Wait " + cooldown + " seconds!";
+  button.disabled = true;
+  button.style.cursor = "not-allowed";
+  button.innerText = "Wait " + cooldown + " seconds!";
 }
 function addClipToHistory(id) {
-    lastURLs.push({ id, active: true });
+  lastURLs.push({ id, active: true });
 }
 function startLoading() {
-    if (loadingInterval)
-        clearInterval(loadingInterval);
-    loading.style.display = "block";
-    linkHelp.style.display = "none";
-    linkIssues.style.display = "none";
-    loading.innerText = LOADING_MESSAGE;
-    let numOfDots = 0;
-    loadingInterval = setInterval(() => {
-        numOfDots += 1;
-        if (numOfDots >= 4)
-            numOfDots = 0;
-        loading.innerText = LOADING_MESSAGE + ".".repeat(numOfDots);
-    }, 500);
+  if (loadingInterval) clearInterval(loadingInterval);
+  loading.style.display = "block";
+  linkHelp.style.display = "none";
+  linkIssues.style.display = "none";
+  loading.innerText = LOADING_MESSAGE;
+  let numOfDots = 0;
+  loadingInterval = setInterval(() => {
+    numOfDots += 1;
+    if (numOfDots >= 4) numOfDots = 0;
+    loading.innerText = LOADING_MESSAGE + ".".repeat(numOfDots);
+  }, 500);
 }
 function stopLoading(successful = true, id = "") {
-    if (id) {
-        if (successful)
-            updateClipFromHistory(id);
-        else
-            removeClipFromHistory(id);
-    }
-    if (lastURLs.some((u) => u.active))
-        return;
-    if (loadingInterval)
-        clearInterval(loadingInterval);
-    if (!successful) {
-        linkHelp.style.display = "block";
-        linkIssues.style.display = "block";
-    }
-    loading.style.display = "none";
+  if (id) {
+    if (successful) updateClipFromHistory(id);
+    else removeClipFromHistory(id);
+  }
+  if (lastURLs.some((u) => u.active)) return;
+  if (loadingInterval) clearInterval(loadingInterval);
+  if (!successful) {
+    linkHelp.style.display = "block";
+    linkIssues.style.display = "block";
+  }
+  loading.style.display = "none";
 }
 // Cooldown
 setInterval(() => {
-    if (cooldown > 0) {
-        button.disabled = true;
-        button.style.cursor = "not-allowed";
-        button.innerText = "Wait " + cooldown + " seconds!";
-        cooldown--;
-    }
-    else {
-        button.disabled = false;
-        button.style.cursor = "pointer";
-        if (button.innerText !== "Download")
-            button.innerText = "Download Another Clip";
-    }
+  if (cooldown > 0) {
+    button.disabled = true;
+    button.style.cursor = "not-allowed";
+    button.innerText = "Wait " + cooldown + " seconds!";
+    cooldown--;
+  } else {
+    button.disabled = false;
+    button.style.cursor = "pointer";
+    if (button.innerText !== "Download")
+      button.innerText = "Download Another Clip";
+  }
 }, 1000);

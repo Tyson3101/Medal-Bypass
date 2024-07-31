@@ -10,8 +10,13 @@ app.use(cors()); // Use cors middleware
 // Function to get video URL from the HTML content
 async function getVideoURL(url: string) {
   try {
+    // Extract the clip ID from the URL
+    const clipId = extractClipID(url);
+    // https://medal.tv/?contentId= for direct page
+    const fetchURL = clipId ? `https://medal.tv/?contentId=${clipId}` : url;
+
     // Fetch the HTML content of the Medal Clip
-    const res = await fetch(url);
+    const res = await fetch(fetchURL);
     const html = await res.text();
 
     // Check for contentUrl in the hydrationData
@@ -87,7 +92,7 @@ function configureURL(url: string) {
     url = "https://" + url;
   }
   url = url.replace("?theater=true", "");
-  return url;
+  return url.trim();
 }
 
 // Function to check the validity of the URL
@@ -101,6 +106,15 @@ function checkURL(url: string) {
     return false;
   }
   return true;
+}
+
+function extractClipID(url: string): string | false {
+  const clipIdMatch = url.match(/\/clips\/([^\/?&]+)/);
+  const contentIdMatch = url.match(/[?&]contentId=([^&]+)/);
+
+  if (clipIdMatch) return clipIdMatch[1];
+  if (contentIdMatch) return contentIdMatch[1];
+  return false;
 }
 
 // Helper function to get input URL
