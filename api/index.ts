@@ -60,11 +60,15 @@ async function handleRequest(req: Request, res: Response) {
 app.get("/api/clip", handleRequest);
 app.post("/api/clip", handleRequest);
 
-app.get("*", (_req, res) => {
+// Redirect to the API documentation for other requests
+app.get("/api", redirectDocumentation);
+app.get("/api/*", redirectDocumentation);
+
+function redirectDocumentation(_req: Request, res: Response) {
   res
     .status(404)
     .redirect("https://github.com/Tyson3101/Medal-Bypass/blob/main/API.md");
-});
+}
 
 // Start the server
 const port = process.env.PORT || 3000;
