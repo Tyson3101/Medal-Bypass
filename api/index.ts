@@ -12,8 +12,8 @@ async function getVideoURL(url: string) {
   try {
     // Extract the clip ID from the URL
     const clipId = extractClipID(url);
-    // https://medal.tv/?contentId= for direct page
-    const fetchURL = clipId ? `https://medal.tv/?contentId=${clipId}` : url;
+    // https://medal.tv/clips/${clipId} for direct page if only clipId is provided
+    const fetchURL = clipId ? `https://medal.tv/clips/${clipId}` : url;
 
     // Fetch the HTML content of the Medal Clip
     const res = await fetch(fetchURL);
